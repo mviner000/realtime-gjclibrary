@@ -4,7 +4,7 @@ import { useState, KeyboardEvent } from "react";
 import { useMutation } from "convex/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { api } from "../../convex/_generated/api";
+import { api } from "../../../convex/_generated/api";
 
 export const ComponentCreator = () => {
   const [componentName, setComponentName] = useState("");

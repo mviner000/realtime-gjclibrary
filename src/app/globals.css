@@ -76,3 +76,26 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  .card-text {
+    @apply font-bold text-black text-xl;
+  }
+
+  .card-subtext {
+    @apply font-semibold text-black text-lg;
+  }
+
+  .card-field {
+    @apply border-b border-black font-semibold text-black text-xl;
+  }
+
+  .card-section {
+    @apply flex flex-row;
+  }
+  .red-line-through {
+    text-decoration: line-through;
+    text-decoration-color: red;
+    text-decoration-thickness: 2px;
+  }
+}

@@ -1,10 +1,10 @@
 import React from 'react';
 import { useQuery, useMutation } from "convex/react";
-import { api } from "../../convex/_generated/api";
+import { api } from '../../../convex/_generated/api';
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Id } from "../../convex/_generated/dataModel";
+import { Id } from '../../../convex/_generated/dataModel';
 
 const ComponentList = () => {
   const components = useQuery(api.queries.getAllComponentStyles);

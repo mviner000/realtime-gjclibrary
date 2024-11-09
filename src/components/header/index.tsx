@@ -1,8 +1,4 @@
-import Link from "next/link";
-import { HeaderActions } from "./header-actions";
-import Image from "next/image";
 import getCurrentUser from "@/utils/getCurrentUser";
-import NotifsToggle from "@/components/layout/Notifs/notifs-toggle";
 import { NavbarWrapper } from "../moderator/NavbarWrapper";
 
 export async function Header() {

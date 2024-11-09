@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { api } from "../../../convex/_generated/api";
 import { CurrentUser } from "@/utils/getCurrentUser";
 import { ProfileDropdown } from "../header/profile-dropdown";
+import { ModeToggle } from "../header/mode-toggle";
 
 type Props = {
   user: CurrentUser | null;
@@ -51,16 +52,18 @@ export function GJCNavbar({ user }: Props) {
           </Link>
           <nav>
             <ul className={cn("flex space-x-4", navbarParentLinksStyle.tailwindClasses)}>
-              <li className={cn("text-base cursor-pointer", navbarChildrenLinksStyle.tailwindClasses)}>
+              {showProfileDropdown ? (
+                <>
+                <li className={cn("text-base cursor-pointer", navbarChildrenLinksStyle.tailwindClasses)}>
                 <Link href="/dashboard">Dashboard</Link>
               </li>
               <li className={cn("text-base cursor-pointer", navbarChildrenLinksStyle.tailwindClasses)}>
                 <Link href="/settings">Settings</Link>
               </li>
-              {showProfileDropdown ? (
                 <ProfileDropdown user={user} />
+                </>
               ) : (
-                !user && <span>none</span>
+                !user && <ModeToggle />
               )}
             </ul>
           </nav>

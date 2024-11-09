@@ -1,15 +1,11 @@
 import type { Metadata } from "next";
 import NextTopLoader from "nextjs-toploader";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/providers";
 import { Toaster } from "@/components/ui/toaster";
 import { Header } from "@/components/header";
 import { AuthProvider } from "@/providers/authProviders";
 import { Suspense } from "react";
-import { cn } from "@/lib/utils";
-import { archivo, libre_franklin, oswald } from "@/utils/fonts";
-import { NotificationsProvider } from "@/contexts/NotificationsContext";
 import { ConvexClientProvider } from "./ConvexClientProvider";
 import localFont from "next/font/local";
 import Script from "next/script";
@@ -54,7 +50,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <Script src="https://cdn.tailwindcss.com"></Script>
       </head>
@@ -66,10 +62,8 @@ export default function RootLayout({
             <ConvexClientProvider>
               <Providers>
                 <NextTopLoader color="#E09900" />
-                <NotificationsProvider>
                   <Header />
                   {children}
-                </NotificationsProvider>
               </Providers>
               <Toaster />
             </ConvexClientProvider>
