@@ -188,8 +188,8 @@ export default function SettingsCard() {
     {
       data: {
         id: '2',
-        title: 'Frontend API Development',
-        description: 'Develop RESTful API for the new mobile app',
+        title: 'Frontend Development',
+        description: 'Develop frontend this new website',
         assignedTo: [
           { name: 'Maverick Rosales', avatar: '/placeholder.svg?height=32&width=32' },
         ],

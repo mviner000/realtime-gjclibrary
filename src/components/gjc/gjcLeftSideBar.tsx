@@ -98,7 +98,7 @@ export default function GJCLeftSideBar() {
         <>
         <motion.button
             className={cn(
-                "fixed top-20 p-1 border border-black rounded-full bg-white z-[9999]",
+                "fixed top-20 p-1 border border-black rounded-full bg-white z-[49]",
                 isExpanded ? "left-60" : "left-12"
             )}
             onClick={toggleSidebar}
@@ -173,8 +173,11 @@ export default function GJCLeftSideBar() {
                             </CollapsibleTrigger>
                             <CollapsibleContent className="space-y-1 mt-1">
                                 {[
-                                    { href: "/books", label: "Books", fallback: "BC" },
-                                    { href: "/student", label: "Student Cards", fallback: "SC" },
+                                    // { href: "/books", label: "Books", fallback: "BC" },
+                                    // { href: "/student", label: "Student Cards", fallback: "SC" },
+                                    { href: "/settings", label: "ADMIN SETTINGS", fallback: "AS" },
+                                    { href: "/settings/designer", label: "Shortcut ni MACK", fallback: "MR" },
+                                    { href: "/settings/frontend", label: "Shortcut ni MAVS", fallback: "RM" },
                                 ].map(({ href, label, fallback }) => (
                                     <div key={href}>
                                         <Link href={href}>

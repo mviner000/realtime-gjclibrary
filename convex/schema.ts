@@ -13,6 +13,7 @@ export default defineSchema({
     notes: v.string(),
     updated_at: v.number(),
     isChecked: v.optional(v.boolean()), 
+    imageId: v.optional(v.id("_storage")),
   })
     .index("by_pageNumber", ["pageNumber"])
     .index("by_proposedBy", ["proposedBy"])

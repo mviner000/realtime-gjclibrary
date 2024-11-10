@@ -11,7 +11,7 @@ const DesignerSettingsPage: React.FC = async () => {
   return (
     <div className="p-6">
    <h1 className="text-6xl font-bold mb-4">User Interface Design Settings - Mack Rafanan</h1>
-      <p className="mb-6">Welcome to the main settings page.</p>
+      <p className="mb-6">Welcome to the designer settings page.</p>
     <PageDesignManager />
    </div>
   );

@@ -22,6 +22,7 @@ export interface PageType {
   approvedBy: string
   notes: string
   isChecked: boolean
+  imageId?: Id<"_storage">
 }
 
 export type UserId = number;
