@@ -22,25 +22,17 @@ import { cn } from "@/lib/utils"
 import { GJCButton } from "../ui/gjc_ui/gjcButton"
 import Link from "next/link"
 import { useSidebarStore } from "@/hooks/useSidebarStore"
+import { useFetchUser } from "@/utils/useFetchUser"
+import { useAuth } from "@/providers/authProviders"
+import { LoadingState } from "@/constants/loading-state"
 
 export default function GJCLeftSideBar() {
     const [isShortcutsOpen, setIsShortcutsOpen] = React.useState(true)
     const { isExpanded, toggleSidebar } = useSidebarStore()
     const [isMobile, setIsMobile] = React.useState(false)
 
-    React.useEffect(() => {
-        const checkMobile = () => {
-            setIsMobile(window.innerWidth < 768)
-            if (window.innerWidth < 768) {
-                useSidebarStore.setState({ isExpanded: false })
-            } else {
-                useSidebarStore.setState({ isExpanded: true })
-            }
-        }
-        checkMobile()
-        window.addEventListener('resize', checkMobile)
-        return () => window.removeEventListener('resize', checkMobile)
-    }, [])
+    const { data, error, isLoading, role } = useFetchUser();
+    const auth = useAuth();
 
     const leftSidebarStyle = useQuery(api.queries.getComponentStyle, { 
         componentName: "leftSideBar" 
@@ -90,31 +82,77 @@ export default function GJCLeftSideBar() {
         componentName: "leftSideBar.footer.text" 
     });  
 
+    React.useEffect(() => {
+        if (error?.status === 401) {
+            auth.loginRequiredRedirect();
+        }
+    }, [auth, error]);
+
+    React.useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 768)
+            if (window.innerWidth < 768) {
+                useSidebarStore.setState({ isExpanded: false })
+            } else {
+                useSidebarStore.setState({ isExpanded: true })
+            }
+        }
+        checkMobile()
+        window.addEventListener('resize', checkMobile)
+        return () => window.removeEventListener('resize', checkMobile)
+    }, [])
+
     if (!leftSidebarStyle || !leftSidebarMainLinksStyle || !leftSidebarMainParentLinksStyle || !leftSidebarMainLinksIconStyle || !leftSidebarYourShortCutsAccordionStyle || !leftSidebarYourShortCutsAccordionTextStyle || !leftSidebarYourShortCutsAccordionIconStyle || !leftSidebarShortCutsButton  || !leftSidebarShortCutsButtonText || !leftSidebarShortCutsButtonIcon || !leftSidebarFooterParent || !leftSidebarFooterText) {
         return <div className="text-muted-foreground">Loading leftSideBar styles...</div>;
     }
 
+    // Filter shortcuts based on user conditions
+    const shortcutLinks = [
+        ...(role === 'admin' ? [{ href: "/settings", label: "ADMIN SETTINGS", fallback: "AS" }] : []),
+        ...(data?.username === "esternon52320018" ? [{ href: "/settings/manager", label: "Shortcut ni JONN", fallback: "JE" }] : []),
+        ...(data?.username === "nogoy52311077" ? [{ href: "/settings/designer", label: "Shortcut ni Melvz", fallback: "MN" }] : []),
+        ...(data?.username === "rafanan52310085" ? [{ href: "/settings/designer", label: "Shortcut ni MACK", fallback: "MR" }] : []),
+        ...(data?.username === "rosales52310393" ? [{ href: "/settings/frontend", label: "Shortcut ni MAVS", fallback: "RM" }] : [])
+    ];
+
+    // Define navigation items based on user
+    const navigationItems = [
+        { href: "/", icon: Home, label: "Home" },
+        { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
+    ];
+
+    // Add additional navigation items if user is not abad52310078
+    if (data?.username !== "abad52310078") {
+        navigationItems.push(
+            { href: "/students", icon: UsersRound, label: "Students" },
+            { href: "/faculties", icon: UserPlus, label: "Faculties" },
+            { href: "/admins", icon: Sparkle, label: "Admins" }
+        );
+    }
+
+    const showShortcuts = data?.username !== "abad52310078" && isExpanded && shortcutLinks.length > 0;
+
     return (
         <>
-        <motion.button
-            className={cn(
-                "fixed top-20 p-1 border border-black rounded-full bg-white z-[49]",
-                isExpanded ? "left-60" : "left-12"
-            )}
-            onClick={toggleSidebar}
-            animate={{
-                left: isExpanded ? "15rem" : "3rem",
-                rotate: isExpanded ? 180 : 0
-            }}
-            transition={{
-                type: "spring",
-                stiffness: 260,
-                damping: 20
-            }}
-            aria-label={isExpanded ? "Collapse sidebar" : "Expand sidebar"}
-        >
-            <ArrowRight className="text-black h-4 w-4" />
-        </motion.button>
+            <motion.button
+                className={cn(
+                    "fixed top-20 p-1 border border-black rounded-full bg-white z-[49]",
+                    isExpanded ? "left-60" : "left-12"
+                )}
+                onClick={toggleSidebar}
+                animate={{
+                    left: isExpanded ? "15rem" : "3rem",
+                    rotate: isExpanded ? 180 : 0
+                }}
+                transition={{
+                    type: "spring",
+                    stiffness: 260,
+                    damping: 20
+                }}
+                aria-label={isExpanded ? "Collapse sidebar" : "Expand sidebar"}
+            >
+                <ArrowRight className="text-black h-4 w-4" />
+            </motion.button>
             <motion.aside 
                 className={cn(
                     "pt-16 fixed top-16 left-0 h-[calc(100vh-4rem)] flex-shrink-0 overflow-y-auto border-r p-4",
@@ -131,13 +169,7 @@ export default function GJCLeftSideBar() {
             >
                 <nav className="space-y-2 mt-6">
                     <TooltipProvider>
-                        {[
-                            { href: "/", icon: Home, label: "Home" },
-                            { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
-                            { href: "/students", icon: UsersRound, label: "Students" },
-                            { href: "/faculties", icon: UserPlus, label: "Faculties" },
-                            { href: "/admins", icon: Sparkle, label: "Admins" },
-                        ].map(({ href, icon: Icon, label }) => (
+                        {navigationItems.map(({ href, icon: Icon, label }) => (
                             <Tooltip key={href}>
                                 <TooltipTrigger asChild>
                                     <div className={leftSidebarMainParentLinksStyle.tailwindClasses}>
@@ -158,7 +190,7 @@ export default function GJCLeftSideBar() {
                         ))}
                     </TooltipProvider>
                 </nav>
-                {isExpanded && (
+                {showShortcuts && (
                     <>
                         <div className="my-4 border-t" />
                         <Collapsible open={isShortcutsOpen} onOpenChange={setIsShortcutsOpen}>
@@ -172,13 +204,7 @@ export default function GJCLeftSideBar() {
                                 </Button>
                             </CollapsibleTrigger>
                             <CollapsibleContent className="space-y-1 mt-1">
-                                {[
-                                    // { href: "/books", label: "Books", fallback: "BC" },
-                                    // { href: "/student", label: "Student Cards", fallback: "SC" },
-                                    { href: "/settings", label: "ADMIN SETTINGS", fallback: "AS" },
-                                    { href: "/settings/designer", label: "Shortcut ni MACK", fallback: "MR" },
-                                    { href: "/settings/frontend", label: "Shortcut ni MAVS", fallback: "RM" },
-                                ].map(({ href, label, fallback }) => (
+                                {shortcutLinks.map(({ href, label, fallback }) => (
                                     <div key={href}>
                                         <Link href={href}>
                                             <GJCButton variant="ghost" className={cn("w-full justify-start", leftSidebarShortCutsButton.tailwindClasses)}>

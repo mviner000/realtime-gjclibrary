@@ -12,7 +12,7 @@ const DashboardPage: React.FC = async () => {
     // <DashReloader />
     <div className="-ml-8 -mt-8">
         <img
-          src="/images/proposal/dashboard.jpg"
+          src="/images/attendance_purpose.jpg"
           alt="homepae proposal"
           width={2000}
           height="auto"

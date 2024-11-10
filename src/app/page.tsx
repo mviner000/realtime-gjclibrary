@@ -14,13 +14,13 @@ return (
     <GJCLeftSideBar/>
     <LeftSideBarLayoutWrapper>
     <FloatingInfoButton />
-    <div className="-ml-8 -mt-8">
-      <img
-        src="/images/proposal/homepage.jpg"
-        alt="homepae proposal"
-        width={2000}
-        height="auto"
-      />
+      <div className="-ml-8 -mt-8">
+        <img
+          src="/images/proposal/homepage.jpg"
+          alt="homepae proposal"
+          width={2000}
+          height="auto"
+        />
       </div>
       </LeftSideBarLayoutWrapper>
     </>

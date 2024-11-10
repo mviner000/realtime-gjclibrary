@@ -55,11 +55,14 @@ export function GJCNavbar({ user }: Props) {
               {showProfileDropdown ? (
                 <>
                 <li className={cn("text-base cursor-pointer", navbarChildrenLinksStyle.tailwindClasses)}>
+                <Link href="/attendance">Attendance</Link>
+                </li>
+                <li className={cn("text-base cursor-pointer", navbarChildrenLinksStyle.tailwindClasses)}>
                 <Link href="/dashboard">Dashboard</Link>
-              </li>
-              <li className={cn("text-base cursor-pointer", navbarChildrenLinksStyle.tailwindClasses)}>
-                <Link href="/settings">Settings</Link>
-              </li>
+                </li>
+                <li className={cn("text-base cursor-pointer", navbarChildrenLinksStyle.tailwindClasses)}>
+                  <Link href="/settings">Settings</Link>
+                </li>
                 <ProfileDropdown user={user} />
                 </>
               ) : (

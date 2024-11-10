@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import React, { useState, useTransition } from "react";
 import Link from "next/link";
@@ -27,9 +27,10 @@ const LOGIN_URL = "/api/login";
 
 export const LoginForm = () => {
   const searchParams = useSearchParams();
-  const urlError = searchParams.get("error") === "OAuthAccountNotLinked"
-    ? "Sign in or register with another email provider"
-    : "";
+  const urlError =
+    searchParams.get("error") === "OAuthAccountNotLinked"
+      ? "Sign in or register with another email provider"
+      : "";
 
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | undefined>("");
@@ -71,14 +72,19 @@ export const LoginForm = () => {
     }
   };
 
-  const inputClass = "text-black bg-neutral-100 border-slate-300 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-300";
+  // const inputClass =
+  //   "text-black bg-neutral-100 border-slate-300 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-300";
+
+    const inputClass =
+    "text-black bg-neutral-100 border-slate-300 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-300 rounded-full text-center";
 
   return (
     <CardWrapper
-      headerTitle="Admin"
+      headerTitle="General De Jesus"
+      headerTitle2="College Library"
       headerLabel="This page is restricted"
       headerLabelColor="text-rose-400"
-      backButtonLabel="Don't have an account?"
+      backButtonLabel=""
       backButtonHref="/auth/register"
       showSocial
     >
@@ -129,7 +135,7 @@ export const LoginForm = () => {
             <Button
               variant="link"
               size="sm"
-              className="h-4 px-0 font-normal text-sm"
+              className="h-4 px-0 font-normal text-sm dark:text-slate-200"
               asChild
             >
               <Link href="/auth/reset">Forgot password?</Link>
@@ -145,7 +151,7 @@ export const LoginForm = () => {
               />
               <label
                 htmlFor="togglepwd"
-                className="text-gray-400 ml-1 text-xs font-normal leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                className="text-slate-200 ml-1 text-xs font-normal leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
               >
                 Show password
               </label>
@@ -157,7 +163,15 @@ export const LoginForm = () => {
               <FidgetSpinner />
             </div>
           ) : (
-            <Button disabled={loading || !form.getValues("username") || !form.getValues("password")} type="submit" className="w-full">
+            <Button
+              disabled={
+                loading ||
+                !form.getValues("username") ||
+                !form.getValues("password")
+              }
+              type="submit"
+              className="w-full"
+            >
               Log in
             </Button>
           )}

@@ -9,19 +9,20 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { LogoutButton } from "../auth/logout-button";
 import { ModeToggle } from "./mode-toggle";
 import { CurrentUser } from "@/utils/getCurrentUser";
-import Image from "next/image";
 import { useEffect, useState } from "react";
+import QuickLoginForm from "../QuickLoginForm";
 
-const NEXT_AVATAR_API_AURL = "api/avatar"
+const NEXT_AVATAR_API_AURL = "api/avatar";
 
 export function ProfileDropdown({ user }: { user: CurrentUser }) {
-  const navLinks = user.is_staff 
-  ? ADMIN_NAV_LINKS(user.school_id)  
-  : [STUDENT_NAV_LINKS(user.school_id)];
+  const navLinks = user.is_staff
+    ? ADMIN_NAV_LINKS(user.school_id, user.username)
+    : [STUDENT_NAV_LINKS(user.school_id)];
+
   const [avatarUrl, setAvatarUrl] = useState(null);
 
   useEffect(() => {
@@ -31,8 +32,7 @@ export function ProfileDropdown({ user }: { user: CurrentUser }) {
       setAvatarUrl(data.cropped_avatar_url);
     }
     fetchAvatar();
-  }, [NEXT_AVATAR_API_AURL]);
-
+  }, []);
 
   return (
     <>
@@ -53,13 +53,17 @@ export function ProfileDropdown({ user }: { user: CurrentUser }) {
             </AvatarFallback>
           </Avatar>
         </DropdownMenuTrigger>
-
         <DropdownMenuContent className="z-[100] space-y-2">
           <DropdownMenuLabel>{user.username}</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <div className="ml-2">
             <ModeToggle />
           </div>
+          {user.username !== "abad52310078" && (
+            <div className="ml-2">
+              <QuickLoginForm />
+            </div>
+          )}
           <DropdownMenuSeparator />
           {navLinks.map((link) => (
             <DropdownMenuItem
