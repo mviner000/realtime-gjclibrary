@@ -42,7 +42,7 @@ const SettingsBreadcrumb = () => {
   });
 
   return (
-    <nav className="flex w-3/4 items-center p-4 bg-gray-100 dark:bg-transparent rounded-lg mb-4">
+    <nav className="flex w-3/4 items-center p-4 bg-gray-100 dark:bg-transparent rounded-lg">
       <Link 
         href="/" 
         className="text-blue-600 hover:text-blue-800 hover:underline mx-2"
