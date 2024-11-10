@@ -19,7 +19,9 @@ import { useEffect, useState } from "react";
 const NEXT_AVATAR_API_AURL = "api/avatar"
 
 export function ProfileDropdown({ user }: { user: CurrentUser }) {
-  const navLinks = user.is_staff ? ADMIN_NAV_LINKS : STUDENT_NAV_LINKS;
+  const navLinks = user.is_staff 
+  ? ADMIN_NAV_LINKS(user.school_id)  
+  : [STUDENT_NAV_LINKS(user.school_id)];
   const [avatarUrl, setAvatarUrl] = useState(null);
 
   useEffect(() => {

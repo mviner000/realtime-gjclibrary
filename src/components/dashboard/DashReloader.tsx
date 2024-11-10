@@ -81,16 +81,15 @@ export function DashReloader() {
 
   return (
     <PageContainer scrollable={true}>
-      <div>
-        <p>Page will reload in {countdown} seconds.</p>
-      </div>
-      <div className="space-y-2">
-        <div className="flex items-center justify-between space-y-2">
-          <h2 className="text-2xl font-bold tracking-tight">
-            Hi, Welcome back 👋
-          </h2>
-          <div className="hidden items-center space-x-2 md:flex">
-            <DownloadReport />
+      <div className="space-y-2 mt-2">
+        <div className="flex items-start justify-between space-y-2">
+          <div >
+            <h2 className="text-2xl font-bold tracking-tight">
+              Hi, Welcome back Admin 👋
+            </h2>
+          </div>
+          <div className="hidden items-center space-x-2 md:flex ">
+           <DownloadReport />
           </div>
         </div>
         {/* <ComboboxPopoverForDateWeeklySelection
@@ -108,7 +107,7 @@ export function DashReloader() {
           <TabsContent value="pie-graph" className="space-y-4">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-7">
               <div className="col-span-4 md:col-span-4">
-                <AttendanceFor />
+                {/* <AttendanceFor /> */}
               </div>
               {/* <div className="col-span-4 md:col-span-3">
                 {isWeekly ? <PieGraph /> : <DailyPieGraph />}

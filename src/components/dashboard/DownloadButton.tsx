@@ -82,21 +82,20 @@ const DownloadButton: React.FC<Props> = ({ initialDate }) => {
     };
 
     return (
-        <div className="flex justify-end flex-col gap-2">
+        <div className="flex flex-col gap-2">
+            <h1 className='font-bold text-lg'>Statistics Downloader:</h1>
             <ComboboxPopoverForDownloadPDF onStatusChange={handleStatusChange} />
-            <DatePicker2 selected={date} onChange={handleDateChange} />
-            <Button
-                className='hover:bg-emerald-500/50 p-1 bg-stone-400/40 rounded-sm'
+            <div className="flex items-center gap-1 justify-between">
+                <DatePicker2 selected={date} onChange={handleDateChange} />
+                <Button
+                className='hover:bg-emerald-500/50 p-1 bg-stone-400/40 rounded-lg'
                 onClick={handleClick}
                 disabled={loading || !selectedStatus}
-                variant="emerald"
-            >
-
-                <span className='flex items-center justify-between gap-1 '>
-                    <Download size="14" />
-                    {loading ? 'Downloading...' : 'Download PDF'}
-                </span>
-            </Button>
+                variant="ghost"
+                >
+                <Download width="26"  />
+                </Button>
+            </div>
         </div>
     );
 };

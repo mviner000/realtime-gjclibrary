@@ -52,6 +52,7 @@
     "date-fns": "^3.6.0",
     "embla-carousel-autoplay": "^8.2.1",
     "embla-carousel-react": "^8.2.1",
+    "framer-motion": "^11.11.11",
     "html2pdf.js": "^0.10.2",
     "input-otp": "^1.2.4",
     "js-cookie": "^3.0.5",

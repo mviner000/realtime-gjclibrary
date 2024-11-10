@@ -24,7 +24,7 @@ export const useStudentDetails = (studentId: string) => {
                 const data = await response.json();
                 setAccount(data);
             } catch (error) {
-                setError('This account does not login yet');
+                setError('This account does not exist');
             } finally {
                 setIsLoading(false);
             }

@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from "react"
-import { BookOpen, ChevronDown, Home, UsersRound, UserPlus, Sparkle } from "lucide-react"
+import { BookOpen, ChevronDown, Home, UsersRound, UserPlus, Sparkle, LayoutDashboard } from "lucide-react"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
@@ -19,6 +19,7 @@ import { useQuery } from "convex/react"
 import { api } from "../../../convex/_generated/api"
 import { cn } from "@/lib/utils"
 import { GJCButton } from "../ui/gjc_ui/gjcButton"
+import Link from "next/link"
 
 export default function GJCLeftSideBar() {
     const [isShortcutsOpen, setIsShortcutsOpen] = React.useState(true)
@@ -82,14 +83,31 @@ export default function GJCLeftSideBar() {
             <Tooltip>
                 <TooltipTrigger asChild>
                 <div className={leftSidebarMainParentLinksStyle.tailwindClasses}>
-                <GJCButton variant="ghost" className={cn("w-full justify-start", leftSidebarMainLinksStyle.tailwindClasses)}>
-                    <Home className={cn("mr-2 h-5 w-5", leftSidebarMainLinksIconStyle.tailwindClasses)}/>
-                    <span>Home</span>
-                </GJCButton>
+                    <Link href="/">
+                        <GJCButton variant="ghost" className={cn("w-full justify-start", leftSidebarMainLinksStyle.tailwindClasses)}>
+                            <Home className={cn("mr-2 h-5 w-5", leftSidebarMainLinksIconStyle.tailwindClasses)}/>
+                            <span>Home</span>
+                        </GJCButton>
+                    </Link>
                 </div>
                 </TooltipTrigger>
                 <TooltipContent>
                 <p>Home</p>
+                </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+                <TooltipTrigger asChild>
+                <div className={leftSidebarMainParentLinksStyle.tailwindClasses}>
+                    <Link href="/dashboard">
+                        <GJCButton variant="ghost" className={cn("w-full justify-start", leftSidebarMainLinksStyle.tailwindClasses)}>
+                            <LayoutDashboard className={cn("mr-2 h-5 w-5", leftSidebarMainLinksIconStyle.tailwindClasses)}/>
+                            <span>Dashboard</span>
+                        </GJCButton>
+                    </Link>
+                </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                <p>Dashboard</p>
                 </TooltipContent>
             </Tooltip>
             </TooltipProvider>
@@ -97,10 +115,12 @@ export default function GJCLeftSideBar() {
             <Tooltip>
                 <TooltipTrigger asChild>
                 <div className={leftSidebarMainParentLinksStyle.tailwindClasses}>
-                <GJCButton variant="ghost" className={cn("w-full justify-start", leftSidebarMainLinksStyle.tailwindClasses)}>
-                    <UsersRound className={cn("mr-2 h-5 w-5", leftSidebarMainLinksIconStyle.tailwindClasses)}/>
-                    <span>Students</span>
-                </GJCButton>
+                    <Link href="/students">
+                        <GJCButton variant="ghost" className={cn("w-full justify-start", leftSidebarMainLinksStyle.tailwindClasses)}>
+                            <UsersRound className={cn("mr-2 h-5 w-5", leftSidebarMainLinksIconStyle.tailwindClasses)}/>
+                            <span>Students</span>
+                        </GJCButton>
+                    </Link>
                 </div>
                 </TooltipTrigger>
                 <TooltipContent>
@@ -112,10 +132,12 @@ export default function GJCLeftSideBar() {
             <Tooltip>
                 <TooltipTrigger asChild>
                 <div className={leftSidebarMainParentLinksStyle.tailwindClasses}>
-                <GJCButton variant="ghost" className={cn("w-full justify-start", leftSidebarMainLinksStyle.tailwindClasses)}>
-                    <UserPlus className={cn("mr-2 h-5 w-5", leftSidebarMainLinksIconStyle.tailwindClasses)}/>
-                    <span>Faculties</span>
-                </GJCButton>
+                    <Link href="/faculties">
+                        <GJCButton variant="ghost" className={cn("w-full justify-start", leftSidebarMainLinksStyle.tailwindClasses)}>
+                            <UserPlus className={cn("mr-2 h-5 w-5", leftSidebarMainLinksIconStyle.tailwindClasses)}/>
+                            <span>Faculties</span>
+                        </GJCButton>
+                    </Link>
                 </div>
                 </TooltipTrigger>
                 <TooltipContent>
@@ -127,10 +149,12 @@ export default function GJCLeftSideBar() {
             <Tooltip>
                 <TooltipTrigger asChild>
                 <div className={leftSidebarMainParentLinksStyle.tailwindClasses}>
-                <GJCButton variant="ghost" className={cn("w-full justify-start", leftSidebarMainLinksStyle.tailwindClasses)}>
-                    <Sparkle className={cn("mr-2 h-5 w-5", leftSidebarMainLinksIconStyle.tailwindClasses)}/>
-                    <span>Admins</span>
-                </GJCButton>
+                    <Link href="/admins">
+                        <GJCButton variant="ghost" className={cn("w-full justify-start", leftSidebarMainLinksStyle.tailwindClasses)}>
+                            <Sparkle className={cn("mr-2 h-5 w-5", leftSidebarMainLinksIconStyle.tailwindClasses)}/>
+                            <span>Admins</span>
+                        </GJCButton>
+                    </Link>
                 </div>
                 </TooltipTrigger>
                 <TooltipContent>
@@ -151,18 +175,26 @@ export default function GJCLeftSideBar() {
             </Button>
             </CollapsibleTrigger>
             <CollapsibleContent className="space-y-1 mt-1">
-            <GJCButton variant="ghost" className={cn("w-full justify-start" , leftSidebarShortCutsButton.tailwindClasses)}>
-                <Avatar className={cn("mr-2 h-6 w-6" , leftSidebarShortCutsButtonIcon.tailwindClasses)}>
-                    <AvatarFallback>BC</AvatarFallback>
-                </Avatar>
-                <span className={leftSidebarShortCutsButtonText.tailwindClasses}>Books</span>
-            </GJCButton>
-            <GJCButton variant="ghost" className={cn("w-full justify-start" , leftSidebarShortCutsButton.tailwindClasses)}>
-                <Avatar className={cn("mr-2 h-6 w-6" , leftSidebarShortCutsButtonIcon.tailwindClasses)}>
-                    <AvatarFallback>SC</AvatarFallback>
-                </Avatar>
-                <span className={leftSidebarShortCutsButtonText.tailwindClasses}>Student Cards</span>
-            </GJCButton>
+                <div>
+                    <Link href="/books">
+                        <GJCButton variant="ghost" className={cn("w-full justify-start" , leftSidebarShortCutsButton.tailwindClasses)}>
+                            <Avatar className={cn("mr-2 h-6 w-6" , leftSidebarShortCutsButtonIcon.tailwindClasses)}>
+                                <AvatarFallback>BC</AvatarFallback>
+                            </Avatar>
+                                <span className={leftSidebarShortCutsButtonText.tailwindClasses}>Books</span>
+                        </GJCButton>
+                    </Link>
+                </div>
+                <div>
+                    <Link href="/student">
+                        <GJCButton variant="ghost" className={cn("w-full justify-start" , leftSidebarShortCutsButton.tailwindClasses)}>
+                            <Avatar className={cn("mr-2 h-6 w-6" , leftSidebarShortCutsButtonIcon.tailwindClasses)}>
+                                <AvatarFallback>SC</AvatarFallback>
+                            </Avatar>
+                            <span className={leftSidebarShortCutsButtonText.tailwindClasses}>Student Cards</span>
+                        </GJCButton>
+                    </Link>
+                </div>
             </CollapsibleContent>
         </Collapsible>
         <div className={cn("fixed bottom-5 text-xs text-gray-500" , leftSidebarFooterParent.tailwindClasses)} >

@@ -1,6 +1,5 @@
 import React, { forwardRef, Ref } from "react";
 import QRCodeSVG from "react-qr-code";
-import Image from "next/image";
 
 interface QRCodeComponentProps {
   value: string;

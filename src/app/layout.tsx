@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
-import NextTopLoader from "nextjs-toploader";
-import "./globals.css";
-import { Providers } from "@/providers";
-import { Toaster } from "@/components/ui/toaster";
-import { Header } from "@/components/header";
-import { AuthProvider } from "@/providers/authProviders";
-import { Suspense } from "react";
-import { ConvexClientProvider } from "./ConvexClientProvider";
-import localFont from "next/font/local";
 import Script from "next/script";
+import localFont from "next/font/local";
+import { Suspense } from "react";
+import NextTopLoader from "nextjs-toploader";
+import { Providers } from "@/providers";
+import { AuthProvider } from "@/providers/authProviders";
+import { ConvexClientProvider } from "@/providers/ConvexClientProvider";
+import { Header } from "@/components/header";
+import { Toaster } from "@/components/ui/toaster";
+import "./globals.css";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",

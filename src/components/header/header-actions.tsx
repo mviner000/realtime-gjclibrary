@@ -4,10 +4,7 @@ import PincodeModal from "./PincodeModal";
 import Cookie from "js-cookie";
 import { useGlobalStore } from "@/stores/globalStore";
 import { ProfileDropdown } from "./profile-dropdown";
-import { LoginButton } from "../auth/login-button";
 import { CurrentUser } from "@/utils/getCurrentUser";
-import { Button } from "../ui/button";
-import Link from "next/link";
 import { ModeToggle } from "./mode-toggle";
 
 type Props = {
@@ -35,9 +32,6 @@ export function HeaderActions({ user }: Props) {
           )}
         </>
       ) : (
-        // <Button asChild variant="secondary" size="sm">
-        //   <Link href="/login">Sign In</Link>
-        // </Button>
         <ModeToggle />
       )}
     </div>
