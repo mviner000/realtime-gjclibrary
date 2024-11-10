@@ -1,3 +1,6 @@
+import { Icons } from "@/components/icons";
+import { Id } from "../../convex/_generated/dataModel";
+
 export interface ButtonType {
   _id: string;
   tailwindClasses: string;
@@ -8,7 +11,18 @@ export type BadgeType = {
   tailwindClasses: string;
 };
 
-import { Icons } from "@/components/icons";
+export interface PageType {
+  _id: Id<"pages">
+  pageNumber: number
+  pageUrl: string
+  proposedBy: string
+  proposedDate: string
+  updatedCounts: number
+  lastUpdateDate: string
+  approvedBy: string
+  notes: string
+  isChecked: boolean
+}
 
 export type UserId = number;
 
