@@ -1,11 +1,12 @@
-import { ComponentStyleEditor } from "@/components/moderator/ComponentStyleEditor";
+import ComponentStyleEditor from "@/components/moderator/ComponentStyleEditor";
+
 
 export default function LeftSideBarSettingsPage() {
   return (
     <>
     <div className="p-6">
     <h1 className="text-6xl font-bold">Left Side Bar UI Settings</h1>
-      <ComponentStyleEditor 
+      <ComponentStyleEditor
       componentNames={[
           "leftSideBar", 
           "leftSideBar.main.links", 

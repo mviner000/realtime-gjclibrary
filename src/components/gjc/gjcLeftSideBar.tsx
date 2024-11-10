@@ -1,7 +1,8 @@
 'use client'
 
 import * as React from "react"
-import { BookOpen, ChevronDown, Home, UsersRound, UserPlus, Sparkle, LayoutDashboard } from "lucide-react"
+import { motion } from "framer-motion"
+import { BookOpen, ChevronDown, Home, UsersRound, UserPlus, Sparkle, LayoutDashboard, Menu, ArrowRight } from "lucide-react"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
@@ -20,9 +21,26 @@ import { api } from "../../../convex/_generated/api"
 import { cn } from "@/lib/utils"
 import { GJCButton } from "../ui/gjc_ui/gjcButton"
 import Link from "next/link"
+import { useSidebarStore } from "@/hooks/useSidebarStore"
 
 export default function GJCLeftSideBar() {
     const [isShortcutsOpen, setIsShortcutsOpen] = React.useState(true)
+    const { isExpanded, toggleSidebar } = useSidebarStore()
+    const [isMobile, setIsMobile] = React.useState(false)
+
+    React.useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 768)
+            if (window.innerWidth < 768) {
+                useSidebarStore.setState({ isExpanded: false })
+            } else {
+                useSidebarStore.setState({ isExpanded: true })
+            }
+        }
+        checkMobile()
+        window.addEventListener('resize', checkMobile)
+        return () => window.removeEventListener('resize', checkMobile)
+    }, [])
 
     const leftSidebarStyle = useQuery(api.queries.getComponentStyle, { 
         componentName: "leftSideBar" 
@@ -74,133 +92,109 @@ export default function GJCLeftSideBar() {
 
     if (!leftSidebarStyle || !leftSidebarMainLinksStyle || !leftSidebarMainParentLinksStyle || !leftSidebarMainLinksIconStyle || !leftSidebarYourShortCutsAccordionStyle || !leftSidebarYourShortCutsAccordionTextStyle || !leftSidebarYourShortCutsAccordionIconStyle || !leftSidebarShortCutsButton  || !leftSidebarShortCutsButtonText || !leftSidebarShortCutsButtonIcon || !leftSidebarFooterParent || !leftSidebarFooterText) {
         return <div className="text-muted-foreground">Loading leftSideBar styles...</div>;
-      }
+    }
 
     return (
-        <aside className={cn("pt-16 fixed top-16 left-0 h-[calc(100vh-4rem)] w-64 flex-shrink-0 overflow-y-auto border-r p-4", leftSidebarStyle.tailwindClasses)}>
-        <nav className="space-y-2">
-            <TooltipProvider>
-            <Tooltip>
-                <TooltipTrigger asChild>
-                <div className={leftSidebarMainParentLinksStyle.tailwindClasses}>
-                    <Link href="/">
-                        <GJCButton variant="ghost" className={cn("w-full justify-start", leftSidebarMainLinksStyle.tailwindClasses)}>
-                            <Home className={cn("mr-2 h-5 w-5", leftSidebarMainLinksIconStyle.tailwindClasses)}/>
-                            <span>Home</span>
-                        </GJCButton>
-                    </Link>
-                </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                <p>Home</p>
-                </TooltipContent>
-            </Tooltip>
-            <Tooltip>
-                <TooltipTrigger asChild>
-                <div className={leftSidebarMainParentLinksStyle.tailwindClasses}>
-                    <Link href="/dashboard">
-                        <GJCButton variant="ghost" className={cn("w-full justify-start", leftSidebarMainLinksStyle.tailwindClasses)}>
-                            <LayoutDashboard className={cn("mr-2 h-5 w-5", leftSidebarMainLinksIconStyle.tailwindClasses)}/>
-                            <span>Dashboard</span>
-                        </GJCButton>
-                    </Link>
-                </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                <p>Dashboard</p>
-                </TooltipContent>
-            </Tooltip>
-            </TooltipProvider>
-            <TooltipProvider>
-            <Tooltip>
-                <TooltipTrigger asChild>
-                <div className={leftSidebarMainParentLinksStyle.tailwindClasses}>
-                    <Link href="/students">
-                        <GJCButton variant="ghost" className={cn("w-full justify-start", leftSidebarMainLinksStyle.tailwindClasses)}>
-                            <UsersRound className={cn("mr-2 h-5 w-5", leftSidebarMainLinksIconStyle.tailwindClasses)}/>
-                            <span>Students</span>
-                        </GJCButton>
-                    </Link>
-                </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                <p>Students</p>
-                </TooltipContent>
-            </Tooltip>
-            </TooltipProvider>
-            <TooltipProvider>
-            <Tooltip>
-                <TooltipTrigger asChild>
-                <div className={leftSidebarMainParentLinksStyle.tailwindClasses}>
-                    <Link href="/faculties">
-                        <GJCButton variant="ghost" className={cn("w-full justify-start", leftSidebarMainLinksStyle.tailwindClasses)}>
-                            <UserPlus className={cn("mr-2 h-5 w-5", leftSidebarMainLinksIconStyle.tailwindClasses)}/>
-                            <span>Faculties</span>
-                        </GJCButton>
-                    </Link>
-                </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                <p>Faculties</p>
-                </TooltipContent>
-            </Tooltip>
-            </TooltipProvider>
-            <TooltipProvider>
-            <Tooltip>
-                <TooltipTrigger asChild>
-                <div className={leftSidebarMainParentLinksStyle.tailwindClasses}>
-                    <Link href="/admins">
-                        <GJCButton variant="ghost" className={cn("w-full justify-start", leftSidebarMainLinksStyle.tailwindClasses)}>
-                            <Sparkle className={cn("mr-2 h-5 w-5", leftSidebarMainLinksIconStyle.tailwindClasses)}/>
-                            <span>Admins</span>
-                        </GJCButton>
-                    </Link>
-                </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                <p>Admins</p>
-                </TooltipContent>
-            </Tooltip>
-            </TooltipProvider>
-        </nav>
-        <div className="my-4 border-t" />
-        <Collapsible open={isShortcutsOpen} onOpenChange={setIsShortcutsOpen}>
-            <CollapsibleTrigger className={leftSidebarYourShortCutsAccordionStyle.tailwindClasses} asChild>
-            <Button variant="ghost" className="w-full justify-between">
-                <div className="flex items-center">
-                <BookOpen className={cn("mr-2 h-5 w-5" , leftSidebarYourShortCutsAccordionIconStyle.tailwindClasses)}/>
-                <span className={leftSidebarYourShortCutsAccordionTextStyle.tailwindClasses}>Your shortcuts</span>
-                </div>
-                <ChevronDown className="h-4 w-4" />
-            </Button>
-            </CollapsibleTrigger>
-            <CollapsibleContent className="space-y-1 mt-1">
-                <div>
-                    <Link href="/books">
-                        <GJCButton variant="ghost" className={cn("w-full justify-start" , leftSidebarShortCutsButton.tailwindClasses)}>
-                            <Avatar className={cn("mr-2 h-6 w-6" , leftSidebarShortCutsButtonIcon.tailwindClasses)}>
-                                <AvatarFallback>BC</AvatarFallback>
-                            </Avatar>
-                                <span className={leftSidebarShortCutsButtonText.tailwindClasses}>Books</span>
-                        </GJCButton>
-                    </Link>
-                </div>
-                <div>
-                    <Link href="/student">
-                        <GJCButton variant="ghost" className={cn("w-full justify-start" , leftSidebarShortCutsButton.tailwindClasses)}>
-                            <Avatar className={cn("mr-2 h-6 w-6" , leftSidebarShortCutsButtonIcon.tailwindClasses)}>
-                                <AvatarFallback>SC</AvatarFallback>
-                            </Avatar>
-                            <span className={leftSidebarShortCutsButtonText.tailwindClasses}>Student Cards</span>
-                        </GJCButton>
-                    </Link>
-                </div>
-            </CollapsibleContent>
-        </Collapsible>
-        <div className={cn("fixed bottom-5 text-xs text-gray-500" , leftSidebarFooterParent.tailwindClasses)} >
-
-            <p className={leftSidebarFooterText.tailwindClasses}>Privacy · Terms · Team Library © 2024</p>
-        </div>
-        </aside>
+        <>
+        <motion.button
+            className={cn(
+                "fixed top-20 p-1 border border-black rounded-full bg-white z-[9999]",
+                isExpanded ? "left-60" : "left-12"
+            )}
+            onClick={toggleSidebar}
+            animate={{
+                left: isExpanded ? "15rem" : "3rem",
+                rotate: isExpanded ? 180 : 0
+            }}
+            transition={{
+                type: "spring",
+                stiffness: 260,
+                damping: 20
+            }}
+            aria-label={isExpanded ? "Collapse sidebar" : "Expand sidebar"}
+        >
+            <ArrowRight className="text-black h-4 w-4" />
+        </motion.button>
+            <motion.aside 
+                className={cn(
+                    "pt-16 fixed top-16 left-0 h-[calc(100vh-4rem)] flex-shrink-0 overflow-y-auto border-r p-4",
+                    leftSidebarStyle.tailwindClasses
+                )}
+                animate={{
+                    width: isExpanded ? "16rem" : "4rem"
+                }}
+                transition={{
+                    type: "spring",
+                    stiffness: 260,
+                    damping: 20
+                }}
+            >
+                <nav className="space-y-2 mt-6">
+                    <TooltipProvider>
+                        {[
+                            { href: "/", icon: Home, label: "Home" },
+                            { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
+                            { href: "/students", icon: UsersRound, label: "Students" },
+                            { href: "/faculties", icon: UserPlus, label: "Faculties" },
+                            { href: "/admins", icon: Sparkle, label: "Admins" },
+                        ].map(({ href, icon: Icon, label }) => (
+                            <Tooltip key={href}>
+                                <TooltipTrigger asChild>
+                                    <div className={leftSidebarMainParentLinksStyle.tailwindClasses}>
+                                        <Link href={href}>
+                                            <GJCButton variant="ghost" className={cn("w-full justify-start", leftSidebarMainLinksStyle.tailwindClasses)}>
+                                                <Icon className={cn("mr-2 h-5 w-5", leftSidebarMainLinksIconStyle.tailwindClasses)}/>
+                                                {isExpanded && <span>{label}</span>}
+                                            </GJCButton>
+                                        </Link>
+                                    </div>
+                                </TooltipTrigger>
+                                {!isExpanded && (
+                                    <TooltipContent side="right">
+                                        <p>{label}</p>
+                                    </TooltipContent>
+                                )}
+                            </Tooltip>
+                        ))}
+                    </TooltipProvider>
+                </nav>
+                {isExpanded && (
+                    <>
+                        <div className="my-4 border-t" />
+                        <Collapsible open={isShortcutsOpen} onOpenChange={setIsShortcutsOpen}>
+                            <CollapsibleTrigger className={leftSidebarYourShortCutsAccordionStyle.tailwindClasses} asChild>
+                                <Button variant="ghost" className="w-full justify-between">
+                                    <div className="flex items-center">
+                                        <BookOpen className={cn("mr-2 h-5 w-5", leftSidebarYourShortCutsAccordionIconStyle.tailwindClasses)}/>
+                                        <span className={leftSidebarYourShortCutsAccordionTextStyle.tailwindClasses}>Your shortcuts</span>
+                                    </div>
+                                    <ChevronDown className="h-4 w-4" />
+                                </Button>
+                            </CollapsibleTrigger>
+                            <CollapsibleContent className="space-y-1 mt-1">
+                                {[
+                                    { href: "/books", label: "Books", fallback: "BC" },
+                                    { href: "/student", label: "Student Cards", fallback: "SC" },
+                                ].map(({ href, label, fallback }) => (
+                                    <div key={href}>
+                                        <Link href={href}>
+                                            <GJCButton variant="ghost" className={cn("w-full justify-start", leftSidebarShortCutsButton.tailwindClasses)}>
+                                                <Avatar className={cn("mr-2 h-6 w-6", leftSidebarShortCutsButtonIcon.tailwindClasses)}>
+                                                    <AvatarFallback>{fallback}</AvatarFallback>
+                                                </Avatar>
+                                                <span className={leftSidebarShortCutsButtonText.tailwindClasses}>{label}</span>
+                                            </GJCButton>
+                                        </Link>
+                                    </div>
+                                ))}
+                            </CollapsibleContent>
+                        </Collapsible>
+                        <div className={cn("fixed bottom-5 text-xs text-gray-500", leftSidebarFooterParent.tailwindClasses)} >
+                            <p className={leftSidebarFooterText.tailwindClasses}>Privacy · Terms · Team Library © 2024</p>
+                        </div>
+                    </>
+                )}
+            </motion.aside>
+        </>
     )
 }

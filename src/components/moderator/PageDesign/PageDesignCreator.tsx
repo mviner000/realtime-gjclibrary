@@ -54,7 +54,7 @@ export const PageDesignCreator: React.FC<PageDesignCreatorProps> = ({ className 
 
   return (
     <div className={`space-y-4 p-4 ${className}`}>
-      <h2 className="text-2xl font-bold mb-4">Create New Page</h2>
+      <h2 className="text-2xl font-bold mb-4">Submit your design page</h2>
       <Input
         type="number"
         placeholder="Page Number"

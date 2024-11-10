@@ -1,4 +1,5 @@
-import { ComponentStyleEditor } from "@/components/moderator/ComponentStyleEditor";
+import ComponentStyleEditor from "@/components/moderator/ComponentStyleEditor";
+
 
 export default function NavbarSettingsPage() {
   return (

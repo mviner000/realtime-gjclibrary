@@ -42,7 +42,7 @@ export function GJCNavbar({ user }: Props) {
     <div className={cn("fixed top-0 left-0 right-0 z-50 text-base bg-emerald-500", navbarStyle.tailwindClasses)}>
       <div className="w-full mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          <Link href="https://gjclibrary.com/" className="relative size-14">
+          <Link href="/" className="relative size-14">
             <img
               src="/images/library-logo.png"
               style={{ objectFit: 'cover', width: '20vw', height: 'auto' }}

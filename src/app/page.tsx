@@ -1,31 +1,30 @@
-"use client"
-
 import FloatingInfoButton from "@/components/FloatingInfoButton";
 import GJCLeftSideBar from "@/components/gjc/gjcLeftSideBar";
-import { LoadingState } from "@/constants/loading-state";
-import { useFetchUser } from "@/utils/useFetchUser";
+import LeftSideBarLayoutWrapper from "@/components/wrappers/leftSideBarLayouWrapper";
+import getCurrentUser from "@/utils/getCurrentUser";
+import { redirect } from "next/navigation";
 
-const Homepage = () => {
-  const { data, error, role, isLoading } = useFetchUser();
+const HomePage: React.FC = async () => {
+  const user = await getCurrentUser();
 
-  if (error) {
-    return <LoadingState />;
-  }
-
-  if (isLoading) return <div>Loading...</div>; // add a loading state
+  if (!user) redirect("/login");
 
 return (
-  <main className="pt-[65px] pl-64">
-    <GJCLeftSideBar />
+    <>
+    <GJCLeftSideBar/>
+    <LeftSideBarLayoutWrapper>
     <FloatingInfoButton />
+    <div className="-ml-8 -mt-8">
       <img
         src="/images/proposal/homepage.jpg"
         alt="homepae proposal"
         width={2000}
         height="auto"
       />
-  </main>
+      </div>
+      </LeftSideBarLayoutWrapper>
+    </>
   );
 };
 
-export default Homepage;
+export default HomePage;

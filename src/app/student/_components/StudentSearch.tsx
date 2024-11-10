@@ -2,16 +2,24 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search } from 'lucide-react';
+import { Search, Loader2 } from 'lucide-react';
 
-const StudentSearch = () => {
+export default function StudentSearch() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      router.push(`/student/${encodeURIComponent(searchQuery.trim())}`);
+      setIsLoading(true);
+      try {
+        await router.push(`/student/${encodeURIComponent(searchQuery.trim())}`);
+      } catch (error) {
+        console.error('Navigation failed:', error);
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -24,16 +32,28 @@ const StudentSearch = () => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Enter school id..."
-            className="w-full h-12 px-12 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 outline-none text-lg bg-white shadow-sm dark:text-black"
+            className="w-full h-12 px-12 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 outline-none text-lg bg-white shadow-sm dark:text-black disabled:bg-gray-100 disabled:text-gray-500"
+            disabled={isLoading}
           />
           <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
             <Search size={20} />
           </div>
           <button
             type="submit"
-            className="absolute right-3 top-1/2 -translate-y-1/2 px-4 py-1.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-200 text-sm font-medium"
+            disabled={isLoading}
+            className={`absolute right-3 top-1/2 -translate-y-1/2 px-4 py-1.5 bg-blue-600 text-white rounded-md transition-all duration-300 text-sm font-medium flex items-center gap-2
+              ${isLoading 
+                ? 'bg-blue-400 cursor-not-allowed animate-pulse' 
+                : 'hover:bg-blue-700 active:bg-blue-800'}`}
           >
-            Search
+            {isLoading ? (
+              <>
+                <Loader2 size={16} className="animate-spin" />
+                Loading...
+              </>
+            ) : (
+              'Search'
+            )}
           </button>
         </div>
         
@@ -47,6 +67,4 @@ const StudentSearch = () => {
       </form>
     </div>
   );
-};
-
-export default StudentSearch;
+}

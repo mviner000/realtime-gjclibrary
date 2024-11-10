@@ -1,5 +1,6 @@
 import GJCLeftSideBar from '@/components/gjc/gjcLeftSideBar';
 import SettingsBreadcrumb from '@/components/moderator/SettingsBreadcrumb';
+import LeftSideBarLayouWrapper from '@/components/wrappers/leftSideBarLayouWrapper';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -10,13 +11,15 @@ export const metadata: Metadata = {
 export default function FacultiesLayout({
   children
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode
 }) {
   return (
-    <main className="pt-24 pl-72">
+    <main>
       <GJCLeftSideBar />
-      <SettingsBreadcrumb />
-        {children}
-      </main>
-  );
+        <LeftSideBarLayouWrapper>
+          <SettingsBreadcrumb />
+          {children}
+        </LeftSideBarLayouWrapper>
+    </main>
+  )
 }
