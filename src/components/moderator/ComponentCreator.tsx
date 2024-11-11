@@ -8,7 +8,7 @@ import { api } from "../../../convex/_generated/api";
 
 export const ComponentCreator = () => {
   const [componentName, setComponentName] = useState("");
-  const createStyle = useMutation(api.queries.createComponentStyle);
+  const createStyle = useMutation(api.queries.components_styles.createComponentStyle);
 
   const handleCreate = async () => {
     if (!componentName) return;

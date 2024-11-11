@@ -191,10 +191,10 @@ export const PageList: React.FC<PageListProps> = ({ className }) => {
     notes: "",
   })
 
-  const pages = useQuery(api.queries.getAllPages) as PageType[] | undefined
-  const updatePage = useMutation(api.queries.updatePage)
-  const deletePage = useMutation(api.queries.deletePage)
-  const checkPage = useMutation(api.queries.checkPage)
+  const pages = useQuery(api.queries.pages.getAllPages) as PageType[] | undefined
+  const updatePage = useMutation(api.queries.pages.updatePage)
+  const deletePage = useMutation(api.queries.pages.deletePage)
+  const checkPage = useMutation(api.queries.pages.checkPage)
 
   const { data: userData, error, isLoading } = useFetchUser();
   const auth = useAuth();

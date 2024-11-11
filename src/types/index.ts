@@ -4,7 +4,7 @@ import { Id } from "../../convex/_generated/dataModel";
 export interface ButtonType {
   _id: string;
   tailwindClasses: string;
-}
+};
 
 export type BadgeType = {
   _id: string;
@@ -23,6 +23,30 @@ export interface PageType {
   notes: string
   isChecked: boolean
   imageId?: Id<"_storage">
+};
+
+export interface AccountType {
+  _id: Id<"accounts">
+  school_id: string | number
+  first_name?: string
+  middle_name?: string
+  last_name?: string
+  gender?: "MALE" | "FEMALE" | "TOUPDATE"
+  course?: string
+  department?: string
+  position?: string
+  major?: string
+  year_level?: string
+  role?: "Student" | "Faculty"
+  updated_at?: number
+}
+
+export interface SearchResultsType {
+  accounts: AccountType[]
+  totalPages: number
+  currentPage: number
+  hasNextPage: boolean
+  hasPrevPage: boolean
 }
 
 export type UserId = number;

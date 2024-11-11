@@ -4,10 +4,11 @@ import { useQuery } from "convex/react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { api } from "../../../convex/_generated/api";
+
 import { CurrentUser } from "@/utils/getCurrentUser";
 import { ProfileDropdown } from "../header/profile-dropdown";
 import { ModeToggle } from "../header/mode-toggle";
+import { api } from "../../../convex/_generated/api";
 
 type Props = {
   user: CurrentUser | null;
@@ -16,19 +17,19 @@ type Props = {
 export function GJCNavbar({ user }: Props) {
   const pathname = usePathname();
   
-  const navbarStyle = useQuery(api.queries.getComponentStyle, { 
+  const navbarStyle = useQuery(api.queries.components_styles.getComponentStyle, { 
     componentName: "navbar" 
   });
 
-  const navbarLogoStyle = useQuery(api.queries.getComponentStyle, { 
+  const navbarLogoStyle = useQuery(api.queries.components_styles.getComponentStyle, { 
     componentName: "navbar.logo" 
   });
 
-  const navbarParentLinksStyle = useQuery(api.queries.getComponentStyle, { 
+  const navbarParentLinksStyle = useQuery(api.queries.components_styles.getComponentStyle, { 
     componentName: "navbar.link.parent" 
   });
 
-  const navbarChildrenLinksStyle = useQuery(api.queries.getComponentStyle, { 
+  const navbarChildrenLinksStyle = useQuery(api.queries.components_styles.getComponentStyle, { 
     componentName: "navbar.link.children" 
   });
 

@@ -24,8 +24,8 @@ export default function ComponentStyleEditor({
   const [activeTextarea, setActiveTextarea] = useState<Id<"componentStyles"> | null>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   
-  const updateStyle = useMutation(api.queries.updateComponentStyle)
-  const styles = useQuery(api.queries.getAllComponentStyles)
+  const updateStyle = useMutation(api.queries.components_styles.updateComponentStyle)
+  const styles = useQuery(api.queries.components_styles.getAllComponentStyles)
 
   useEffect(() => {
     if (activeTextarea && textareaRef.current) {

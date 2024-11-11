@@ -34,51 +34,51 @@ export default function GJCLeftSideBar() {
     const { data, error, isLoading, role } = useFetchUser();
     const auth = useAuth();
 
-    const leftSidebarStyle = useQuery(api.queries.getComponentStyle, { 
+    const leftSidebarStyle = useQuery(api.queries.components_styles.getComponentStyle, { 
         componentName: "leftSideBar" 
     });
    
-    const leftSidebarMainLinksIconStyle = useQuery(api.queries.getComponentStyle, { 
+    const leftSidebarMainLinksIconStyle = useQuery(api.queries.components_styles.getComponentStyle, { 
         componentName: "leftSideBar.main.links.icon" 
     });
 
-    const leftSidebarMainParentLinksStyle = useQuery(api.queries.getComponentStyle, { 
+    const leftSidebarMainParentLinksStyle = useQuery(api.queries.components_styles.getComponentStyle, { 
         componentName: "leftSideBar.main.parent.links" 
     });
 
-    const leftSidebarMainLinksStyle = useQuery(api.queries.getComponentStyle, { 
+    const leftSidebarMainLinksStyle = useQuery(api.queries.components_styles.getComponentStyle, { 
         componentName: "leftSideBar.main.links" 
     });
 
-    const leftSidebarYourShortCutsAccordionStyle = useQuery(api.queries.getComponentStyle, { 
+    const leftSidebarYourShortCutsAccordionStyle = useQuery(api.queries.components_styles.getComponentStyle, { 
         componentName: "leftSideBar.your.shortcuts.accordion" 
     });
 
-    const leftSidebarYourShortCutsAccordionTextStyle = useQuery(api.queries.getComponentStyle, { 
+    const leftSidebarYourShortCutsAccordionTextStyle = useQuery(api.queries.components_styles.getComponentStyle, { 
         componentName: "leftSideBar.your.shortcuts.accordion.text" 
     });
 
-    const leftSidebarYourShortCutsAccordionIconStyle = useQuery(api.queries.getComponentStyle, { 
+    const leftSidebarYourShortCutsAccordionIconStyle = useQuery(api.queries.components_styles.getComponentStyle, { 
         componentName: "leftSideBar.your.shortcuts.accordion.icon" 
     });
 
-    const leftSidebarShortCutsButton = useQuery(api.queries.getComponentStyle, { 
+    const leftSidebarShortCutsButton = useQuery(api.queries.components_styles.getComponentStyle, { 
         componentName: "leftSideBar.shortcuts.button" 
     });
 
-    const leftSidebarShortCutsButtonText = useQuery(api.queries.getComponentStyle, { 
+    const leftSidebarShortCutsButtonText = useQuery(api.queries.components_styles.getComponentStyle, { 
         componentName: "leftSideBar.shortcuts.button.text" 
     });
 
-    const leftSidebarShortCutsButtonIcon = useQuery(api.queries.getComponentStyle, { 
+    const leftSidebarShortCutsButtonIcon = useQuery(api.queries.components_styles.getComponentStyle, { 
         componentName: "leftSideBar.shortcuts.button.icon" 
     });
 
-    const leftSidebarFooterParent = useQuery(api.queries.getComponentStyle, { 
+    const leftSidebarFooterParent = useQuery(api.queries.components_styles.getComponentStyle, { 
         componentName: "leftSideBar.footer.parent" 
     });
 
-    const leftSidebarFooterText = useQuery(api.queries.getComponentStyle, { 
+    const leftSidebarFooterText = useQuery(api.queries.components_styles.getComponentStyle, { 
         componentName: "leftSideBar.footer.text" 
     });  
 

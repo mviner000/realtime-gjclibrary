@@ -7,8 +7,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Id } from '../../../convex/_generated/dataModel';
 
 const ComponentList = () => {
-  const components = useQuery(api.queries.getAllComponentStyles);
-  const deleteComponent = useMutation(api.queries.deleteComponentStyle);
+  const components = useQuery(api.queries.components_styles.getAllComponentStyles);
+  const deleteComponent = useMutation(api.queries.components_styles.deleteComponentStyle);
 
   const handleDelete = async (id: Id<"componentStyles">) => {
     try {

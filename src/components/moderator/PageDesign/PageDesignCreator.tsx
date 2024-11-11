@@ -30,8 +30,8 @@ export const PageDesignCreator: React.FC<PageDesignCreatorProps> = ({
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [uploading, setUploading] = useState(false)
 
-  const createPage = useMutation(api.queries.createPage)
-  const generateUploadUrl = useMutation(api.queries.generateUploadUrl)
+  const createPage = useMutation(api.queries.pages.createPage)
+  const generateUploadUrl = useMutation(api.queries.pages.generateUploadUrl)
   const { data, error, isLoading } = useFetchUser()
   const auth = useAuth()
 

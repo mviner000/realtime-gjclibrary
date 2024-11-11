@@ -1,3 +1,4 @@
+import AccountSearch from "@/components/AccountSearch";
 import getCurrentUser from "@/utils/getCurrentUser";
 import { redirect } from "next/navigation";
 
@@ -7,9 +8,9 @@ const StudentsPage: React.FC = async () => {
   if (!user) redirect("/login");
 
   return (
-    <h1 className="text-3xl font-bold">
-      Wala Pa Student Page
-    </h1>
+    <div>
+      <AccountSearch />
+    </div>
   );
 };
 

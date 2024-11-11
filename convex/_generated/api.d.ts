@@ -13,7 +13,10 @@ import type {
   FilterApi,
   FunctionReference,
 } from "convex/server";
-import type * as queries from "../queries.js";
+import type * as helper from "../helper.js";
+import type * as queries_accounts from "../queries/accounts.js";
+import type * as queries_components_styles from "../queries/components_styles.js";
+import type * as queries_pages from "../queries/pages.js";
 
 /**
  * A utility for referencing Convex functions in your app's API.
@@ -24,7 +27,10 @@ import type * as queries from "../queries.js";
  * ```
  */
 declare const fullApi: ApiFromModules<{
-  queries: typeof queries;
+  helper: typeof helper;
+  "queries/accounts": typeof queries_accounts;
+  "queries/components_styles": typeof queries_components_styles;
+  "queries/pages": typeof queries_pages;
 }>;
 export declare const api: FilterApi<
   typeof fullApi,
