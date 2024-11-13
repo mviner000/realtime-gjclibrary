@@ -106,7 +106,7 @@ export default function Component() {
   })
 
   return (
-    <div className="w-full max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="w-full max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 pb-10">
       <div ref={searchRef} className="relative">
         <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-2">
           <div className="relative flex-1">
