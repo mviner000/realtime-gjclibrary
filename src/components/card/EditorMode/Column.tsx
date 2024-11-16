@@ -20,7 +20,6 @@ import { ToastAction } from "@/components/ui/toast";
 import { useToast } from "@/components/ui/use-toast";
 import { useBookTransactionsContext } from "@/app/student/_hooks/useBookTransactions";
 import ConfirmationModal from "./ConfirmationModal";
-import TransactionModal from "./TransactionModal";
 
 interface ColumnProps {
   isLastColumn: boolean;
@@ -175,10 +174,13 @@ const Column: React.FC<ColumnProps> = ({
   onDateSelect,
 }) => {
   const [hoveredCell, setHoveredCell] = useState<number | null>(null);
-  const [calendarOpen, setCalendarOpen] = useState(false);
+
+  const [isCalendarDialogOpen, setIsCalendarDialogOpen] = useState(false);
   const [editingCell, setEditingCell] = useState<number | null>(null);
+  const [activeCell, setActiveCell] = useState<number | null>(null);
   const [moveDialogOpen, setMoveDialogOpen] = useState(false);
   const [moveDetails, setMoveDetails] = useState<any>(null);
+  const [calendarOpen, setCalendarOpen] = useState<{ [key: number]: boolean }>({});
   const { toast } = useToast();
   const { bookTransactions, refreshBookTransactions } =
     useBookTransactionsContext();
@@ -435,21 +437,48 @@ const Column: React.FC<ColumnProps> = ({
     });
   };
 
-  const handleOpenChange = (open: boolean) => {
-    if (open) {
-      setCalendarOpen(true);
+  const handleOpenChange = (open: boolean, cellIndex: number) => {
+    // Only allow closing via ESC or outside click if this is the active cell
+    if (!open && cellIndex === activeCell) {
+      setCalendarOpen(prev => ({
+        ...prev,
+        [cellIndex]: false
+      }));
+      setActiveCell(null);
+    } else if (open) {
+      // When opening, set all other cells' calendars to false and this one to true
+      const newCalendarState = Object.keys(calendarOpen).reduce((acc, key) => ({
+        ...acc,
+        [key]: false
+      }), {});
+      setCalendarOpen({
+        ...newCalendarState,
+        [cellIndex]: true
+      });
+      setActiveCell(cellIndex);
+    }
+  };
+
+  
+  const handleDateIconClick = (e: React.MouseEvent, cellIndex: number) => {
+    e.stopPropagation();
+    setActiveCell(cellIndex);
+    setIsCalendarDialogOpen(true);
+  };
+  
+
+
+  const handleDateSelect = (date: Date | undefined) => {
+    if (date && activeCell !== null) {
+      onDateSelect(activeCell, date);
+      setIsCalendarDialogOpen(false);
     }
   };
 
   const handleClose = () => {
-    setCalendarOpen(false);
-  };
-
-  const handleDateSelect = (cellIndex: number) => (date: Date | undefined) => {
-    if (date) {
-      onDateSelect(cellIndex, date);
-      setCalendarOpen(false);
-    }
+    // Reset all calendar popover states to false
+    setCalendarOpen({});
+    setActiveCell(null);
   };
 
   const handleCellClick = (cellIndex: number) => {
@@ -545,33 +574,45 @@ const Column: React.FC<ColumnProps> = ({
               {hoveredCell === cellIndex &&
                 !isDraggable &&
                 mode === "editor" && (
-                  <Popover open={calendarOpen} onOpenChange={handleOpenChange}>
-                    <PopoverTrigger asChild>
-                      <button
-                        className="absolute right-0 top-0 p-1 hover:opacity-80"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setCalendarOpen(true);
-                        }}
-                      >
-                        📅
-                      </button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="end">
-                      <CardCalendar
-                        selected={undefined}
-                        onSelect={handleDateSelect(cellIndex)}
-                        initialFocus
-                        isOpen={calendarOpen}
-                        onClose={handleClose}
-                      />
-                    </PopoverContent>
-                  </Popover>
+                  <button
+                  className="absolute right-0 top-0 p-1 hover:opacity-80"
+                  onClick={(e) => handleDateIconClick(e, cellIndex)}
+                >
+                  📅
+                </button>
                 )}
             </div>
           );
         })}
       </div>
+
+      <Dialog open={isCalendarDialogOpen} onOpenChange={setIsCalendarDialogOpen}>
+      <DialogContent className="sm:max-w-[320px] flex flex-col">
+        <DialogHeader>
+          <DialogTitle>Select Date</DialogTitle>
+        </DialogHeader>
+        <div className="flex-grow">
+          <CardCalendar
+            isOpen={isCalendarDialogOpen}
+            onClose={() => setIsCalendarDialogOpen(false)}
+            onDateSelect={handleDateSelect}
+            activeCellIndex={activeCell}
+            currentCellIndex={activeCell || 0}
+          />
+        </div>
+        <DialogFooter className="flex justify-start text-left mt-4">
+        <div className="absolute bottom-0 left-4 !important">
+          <Button
+            type="button"
+            onClick={() => setIsCalendarDialogOpen(false)}
+            className="!absolute !bottom-4 !left-4"
+          >
+            Close
+          </Button>
+        </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
 
       {moveDetails && (
         <MoveConfirmationDialog

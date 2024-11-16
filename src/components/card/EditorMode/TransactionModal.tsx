@@ -143,7 +143,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
               ))}
             </SelectContent>
           </Select>
-          <div>
+          <div className="hidden">
             <Select
               value={transactionData.status}
               onValueChange={(value) =>

@@ -38,7 +38,7 @@ const UpdateConfirmationModal: React.FC<UpdateConfirmationModalProps> = ({
         <div className="space-y-4">
           <p>Are you sure you want to update this book record?</p>
           <ul className="list-disc list-inside">
-            <li>Transaction ID: {data.transactionId ?? "N/A"}</li>
+            {/* <li>Transaction ID: {data.transactionId ?? "N/A"}</li> */}
             <li>Status: {data.status ?? "N/A"}</li>
             <li>Transaction Date: {data.transactionDate ?? "N/A"}</li>
             <li className="hidden">

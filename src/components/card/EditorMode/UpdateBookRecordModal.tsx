@@ -19,6 +19,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { fetchBookTransactionData } from "./utils/api";
 import { CardCalendar } from "@/components/ui/library-card-calendar-picker";
+import { X } from 'lucide-react';
 
 interface UpdateBookRecordModalProps {
   isOpen: boolean;
@@ -86,8 +87,6 @@ const UpdateBookRecordModal: React.FC<UpdateBookRecordModalProps> = ({
     );
     if (selected) {
       setSelectedTransaction(selected);
-      // Remove this line to maintain the current status
-      // setStatus(selected.status);
     }
   };
 
@@ -97,7 +96,7 @@ const UpdateBookRecordModal: React.FC<UpdateBookRecordModalProps> = ({
       onSubmit({
         transactionId: selectedTransaction.id,
         status,
-        transactionDate, // Use the user-selected date
+        transactionDate,
         placingNumber,
       });
     }
@@ -129,7 +128,9 @@ const UpdateBookRecordModal: React.FC<UpdateBookRecordModalProps> = ({
                     key={transaction.id}
                     value={transaction.id.toString()}
                   >
-                    {transaction.callno} - #{transaction.accession_number}
+                    {transaction.callno === "00000" 
+                      ? "CLEARANCE" 
+                      : `${transaction.callno} - #${transaction.accession_number}`}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -171,11 +172,19 @@ const UpdateBookRecordModal: React.FC<UpdateBookRecordModalProps> = ({
               readOnly
             />
           </div>
-          <DialogFooter>
+          <div className="flex justify-between items-center">
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={onClose}
+              className="rounded-md"
+            >
+              Close
+            </Button>
             <Button type="submit" disabled={!selectedTransaction}>
               Update Record
             </Button>
-          </DialogFooter>
+          </div>
         </form>
       </DialogContent>
     </Dialog>

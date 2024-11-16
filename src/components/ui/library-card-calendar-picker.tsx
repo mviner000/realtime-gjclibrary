@@ -18,6 +18,8 @@ export type CalendarProps = Omit<DayPickerSingleProps, "mode"> & {
   isOpen: boolean;
   onClose: () => void;
   onDateSelect?: (date: Date) => void;
+  activeCellIndex: number | null;
+  currentCellIndex: number;
 };
 
 function CardCalendar({
@@ -27,6 +29,8 @@ function CardCalendar({
   isOpen,
   onClose,
   onDateSelect,
+  activeCellIndex,
+  currentCellIndex,
   ...props
 }: CalendarProps) {
   const [year, setYear] = React.useState(new Date().getFullYear());
@@ -40,8 +44,10 @@ function CardCalendar({
     console.log("[CardCalendar] Calendar state:", isOpen ? "open" : "closed");
   }, [isOpen]);
 
+  // Keep ESC handler to close the calendar
   const handleKeyDown = (event: KeyboardEvent) => {
-    if (event.key === "Escape" && isOpen) {
+    // Only close if this is the active cell
+    if (event.key === "Escape" && isOpen && activeCellIndex === currentCellIndex) {
       console.log("[CardCalendar] ESC pressed, closing calendar");
       event.preventDefault();
       event.stopPropagation();
@@ -50,11 +56,11 @@ function CardCalendar({
   };
 
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && activeCellIndex === currentCellIndex) {
       window.addEventListener("keydown", handleKeyDown, true);
     }
     return () => window.removeEventListener("keydown", handleKeyDown, true);
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, activeCellIndex, currentCellIndex]);
 
   const handleYearChange = (newYear: number) => {
     console.log("[CardCalendar] Year changed to:", newYear);
