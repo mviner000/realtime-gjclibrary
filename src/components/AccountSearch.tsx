@@ -168,7 +168,7 @@ export default function Component() {
               <div className="space-y-4">
                 {searchResults.accounts.map((account) => (
                   <div key={account._id} className="block">
-                    <Link href={`/student/${account.school_id}`}>
+                    <Link href={`/students/${account.school_id}`}>
                       <div className="p-4 border rounded-lg hover:bg-gray-50 hover:text-gray-600 hover:cursor-pointer">
                         <h3 className="font-medium">
                           {account.first_name} {account.middle_name} {account.last_name}

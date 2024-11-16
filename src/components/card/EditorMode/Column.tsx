@@ -18,7 +18,7 @@ import { Button } from "@/components/ui/button";
 import { CardCalendar } from "@/components/ui/library-card-calendar-picker";
 import { ToastAction } from "@/components/ui/toast";
 import { useToast } from "@/components/ui/use-toast";
-import { useBookTransactionsContext } from "@/app/student/_hooks/useBookTransactions";
+import { useBookTransactionsContext } from "@/app/students/_hooks/useBookTransactions";
 import ConfirmationModal from "./ConfirmationModal";
 
 interface ColumnProps {

@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   description: 'Admin dashboard for staffs'
 };
 
-export default function StudentsLayout({
+export default function StudentLayout({
   children
 }: {
   children: React.ReactNode

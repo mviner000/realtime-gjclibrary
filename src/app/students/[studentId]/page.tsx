@@ -63,9 +63,9 @@ const StudentDetails = () => {
                 Back
               </Link>
             </div>
-            <ComboboxPopoverForCheckerEditorMode
+            {/* <ComboboxPopoverForCheckerEditorMode
               onModeChange={handleModeChange}
-            />
+            /> */}
             <div className="w-[920px]">
               <BookCardApproval
                 userId={account.school_id}

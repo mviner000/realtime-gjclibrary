@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { useBookTransactionsContext } from "@/app/student/_hooks/useBookTransactions";
+import { useBookTransactionsContext } from "@/app/students/_hooks/useBookTransactions";
 
 interface AutoReloadWrapperProps {
   children: React.ReactNode;

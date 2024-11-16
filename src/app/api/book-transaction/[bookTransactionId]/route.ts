@@ -51,3 +51,52 @@ export async function GET(
     );
   }
 }
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { bookTransactionId: string } }
+): Promise<NextResponse> {
+  const authToken = getToken();
+
+  if (!authToken) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  try {
+    const response = await fetch(
+      `${env.NEXT_PUBLIC_API_URL}/book-transaction/${params.bookTransactionId}`,
+      {
+        method: "DELETE",
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${authToken}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    // Handle non-JSON responses
+    const contentType = response.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      if (!response.ok) {
+        return NextResponse.json(
+          { error: `HTTP error! status: ${response.status}` },
+          { status: response.status }
+        );
+      }
+      return NextResponse.json({ message: "Success" }, { status: 200 });
+    }
+
+    // Handle JSON responses
+    const result = await response.json();
+    return NextResponse.json(result, {
+      status: response.ok ? 200 : response.status,
+    });
+  } catch (error) {
+    console.error("Error deleting transaction:", error);
+    return NextResponse.json(
+      { error: "Failed to delete transaction" },
+      { status: 500 }
+    );
+  }
+}
