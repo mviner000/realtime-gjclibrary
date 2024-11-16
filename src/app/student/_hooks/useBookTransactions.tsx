@@ -11,6 +11,7 @@ interface BookTransactionsContextType {
   bookTransactions: BookTransaction[] | null;
   error: string | null;
   refreshTransactions: () => void;
+  refreshBookTransactions: () => Promise<void>;
   isRefreshing: boolean;
   refreshCount: number;
 }
@@ -71,6 +72,16 @@ export const useBookTransactions = (accountSchoolId: string) => {
     }
   }, [accountSchoolId]);
 
+  const refreshBookTransactions = useCallback(async () => {
+    setIsRefreshing(true);
+    try {
+      await fetchBookTransactions();
+    } finally {
+      setIsRefreshing(false);
+      setRefreshCount(5);
+    }
+  }, [fetchBookTransactions]);
+
   const refreshTransactions = useCallback(() => {
     setIsRefreshing(true);
     setRefreshCount(5);
@@ -96,6 +107,7 @@ export const useBookTransactions = (accountSchoolId: string) => {
     bookTransactions,
     error,
     refreshTransactions,
+    refreshBookTransactions,
     isRefreshing,
     refreshCount,
     isLoading,
@@ -110,6 +122,7 @@ export const BookTransactionsProvider: React.FC<{
     bookTransactions,
     error,
     refreshTransactions,
+    refreshBookTransactions,
     isRefreshing,
     refreshCount,
   } = useBookTransactions(accountSchoolId);
@@ -120,6 +133,7 @@ export const BookTransactionsProvider: React.FC<{
         bookTransactions,
         error,
         refreshTransactions,
+        refreshBookTransactions,
         isRefreshing,
         refreshCount,
       }}

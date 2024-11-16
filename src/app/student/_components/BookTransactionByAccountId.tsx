@@ -124,35 +124,41 @@ export const BookTransactionByAccountId = () => {
                   } px-2 py-1 rounded`}
                 >
                   {latestRecord?.record_type === "ADDITION"
-                    ? "NO DATA HISTORY YET"
+                    ? "CLEARED"
                     : latestRecord?.record_type || "N/A"}
                 </span>
 
                 <p className="text-lg">
-                  📚 {transaction.book_title || "Unknown Title"}
+                  {transaction.callno === "00000" ? "✔️" : "📚"}{" "}
+                  {transaction.book_title || "Unknown Title"}
                 </p>
               </CardHeader>
-              <CardContent>
-                <p>
-                  <strong>Call Number:</strong> {transaction.callno || "N/A"}
-                </p>
-                <p>
-                  <strong>Accession Number:</strong>{" "}
-                  {transaction.accession_number || "N/A"}
-                </p>
-                <p>
-                  <strong>Borrowed Date:</strong>{" "}
-                  <span className="font-semibold">
-                    {formatDate(borrowed_date)}
-                  </span>
-                </p>
-                <p>
-                  <strong>Returned Date:</strong>{" "}
-                  <span className="font-semibold">
-                    {formatDate(returned_date)}
-                  </span>
-                </p>
-              </CardContent>
+              {transaction.callno !== "00000" && (
+                <>
+                  <CardContent>
+                    <p>
+                      <strong>Call Number:</strong>{" "}
+                      {transaction.callno || "N/A"}
+                    </p>
+                    <p>
+                      <strong>Accession Number:</strong>{" "}
+                      {transaction.accession_number || "N/A"}
+                    </p>
+                    <p>
+                      <strong>Borrowed Date:</strong>{" "}
+                      <span className="font-semibold">
+                        {formatDate(borrowed_date)}
+                      </span>
+                    </p>
+                    <p>
+                      <strong>Returned Date:</strong>{" "}
+                      <span className="font-semibold">
+                        {formatDate(returned_date)}
+                      </span>
+                    </p>
+                  </CardContent>
+                </>
+              )}
               <CardFooter>
                 <div className="w-full">
                   <p className="text-sm text-gray-500 mb-2">
@@ -160,7 +166,11 @@ export const BookTransactionByAccountId = () => {
                   </p>
                   <div className="space-y-1">
                     {transaction.records
-                      .filter((record) => record.record_type !== "ADDITION")
+                      .filter(
+                        (record) =>
+                          record.record_type !== "ADDITION" &&
+                          record.record_type !== "CLEARANCE"
+                      )
                       .sort(
                         (a, b) =>
                           new Date(b.datetime).getTime() -
@@ -172,7 +182,11 @@ export const BookTransactionByAccountId = () => {
                           className="text-sm flex justify-between"
                         >
                           <span>{record.record_type}</span>
-                          <span>{formatDate(record.datetime)}</span>
+                          {record.record_type !== "ADDITION" &&
+                            record.record_type !== "CLEARANCE" &&
+                            record.record_type !== null && (
+                              <span>{formatDate(record.datetime)}</span>
+                            )}
                         </div>
                       ))}
                   </div>

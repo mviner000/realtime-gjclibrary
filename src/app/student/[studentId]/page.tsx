@@ -57,8 +57,8 @@ const StudentDetails = () => {
           <div className="container pt-8 space-x-2 flex w-full justify-between">
             <div className="flex gap-2">
               <Link
-                className="hover:bg-emerald-400/80 p-2 border border-black dark:border-white rounded-md"
-                href="/student"
+                className="hover:bg-emerald-400/80 p-2 text-black dark:text-white bg-transparent outline outline-1 outline-black dark:outline-white rounded-md"
+                href="/students"
               >
                 Back
               </Link>

@@ -9,6 +9,7 @@ import { ConvexClientProvider } from "@/providers/ConvexClientProvider";
 import { Header } from "@/components/header";
 import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
+import { NotificationsProvider } from "@/contexts/NotificationsContext";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -62,8 +63,10 @@ export default function RootLayout({
             <ConvexClientProvider>
               <Providers>
                 <NextTopLoader color="#E09900" />
-                  <Header />
-                  {children}
+                  <NotificationsProvider>
+                    <Header />
+                    {children}
+                  </NotificationsProvider>
               </Providers>
               <Toaster />
             </ConvexClientProvider>

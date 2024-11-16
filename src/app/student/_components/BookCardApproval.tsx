@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/use-toast';
+import { useNotifications } from '@/contexts/NotificationsContext';
 import { CheckIcon, XIcon } from 'lucide-react';
 
 interface BookCardApprovalProps {
@@ -17,6 +18,7 @@ const BookCardApproval: React.FC<BookCardApprovalProps> = ({
     onApprovalChange
 }) => {
     const [isProcessing, setIsProcessing] = useState(false);
+    const { fetchNotifications } = useNotifications();
 
     const handleApproval = async (newApprovalStatus: "approved" | "disapproved") => {
         setIsProcessing(true);
@@ -43,6 +45,7 @@ const BookCardApproval: React.FC<BookCardApprovalProps> = ({
                 description: result.message,
             });
 
+            await fetchNotifications();
         } catch (error) {
             toast({
                 title: "Error",

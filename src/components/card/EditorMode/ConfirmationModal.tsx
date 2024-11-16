@@ -74,6 +74,8 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
       case "RETURNED":
       case "EXTENDED":
       case "CLEARED":
+      case "CLEARANCE":
+        return transactionData.status;
       case "ADDITION":
         return transactionData.status;
       default:
@@ -94,50 +96,50 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
           <CardContent>
             <dl className="divide-y divide-gray-100">
               <div className="px-4 py-2 sm:grid sm:grid-cols-4 sm:gap-4 sm:px-0">
-                <dt className="text-sm font-medium leading-6 col-span-2 text-gray-900">
+                <dt className="text-sm font-medium leading-6 col-span-2 ">
                   Book Title
                 </dt>
-                <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                <dd className="mt-1 text-sm leading-6sm:col-span-2 sm:mt-0">
                   📚 {bookTitle}
                 </dd>
               </div>
               <div className="px-4 py-2 sm:grid sm:grid-cols-4 sm:gap-4 sm:px-0">
-                <dt className="text-sm font-medium leading-6 col-span-2 text-gray-900">
+                <dt className="text-sm font-medium leading-6 col-span-2 ">
                   Call Number
                 </dt>
-                <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                <dd className="mt-1 text-sm leading-6sm:col-span-2 sm:mt-0">
                   {transactionData.callno}
                 </dd>
               </div>
               <div className="px-4 py-2 sm:grid sm:grid-cols-4 sm:gap-4 sm:px-0">
-                <dt className="text-sm font-medium leading-6 col-span-2 text-gray-900">
+                <dt className="text-sm font-medium leading-6 col-span-2 ">
                   Accession Number
                 </dt>
-                <dd className="mt-1 font-bold text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0 text-start">
+                <dd className="mt-1 font-bold text-sm leading-6sm:col-span-2 sm:mt-0 text-start">
                   #{transactionData.accession_number}
                 </dd>
               </div>
               <div className="px-4 py-2 sm:grid sm:grid-cols-4 sm:gap-4 sm:px-0">
-                <dt className="text-sm font-medium leading-6 col-span-2 text-gray-900">
+                <dt className="text-sm font-medium leading-6 col-span-2 ">
                   Status
                 </dt>
-                <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0 text-start align-">
+                <dd className="mt-1 text-sm leading-6sm:col-span-2 sm:mt-0 text-start align-">
                   {getStatusDisplay()}
                 </dd>
               </div>
               <div className="px-4 py-2 sm:grid sm:grid-cols-4 sm:gap-4 sm:px-0">
-                <dt className="text-sm font-medium leading-6 col-span-2 text-gray-900">
+                <dt className="text-sm font-medium leading-6 col-span-2 ">
                   Transaction Date
                 </dt>
-                <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0 text-start align-">
+                <dd className="mt-1 text-sm leading-6sm:col-span-2 sm:mt-0 text-start align-">
                   {transactionData.transaction_date}
                 </dd>
               </div>
               <div className="hidden px-4 py-2 sm:grid sm:grid-cols-4 sm:gap-4 sm:px-0">
-                <dt className="text-sm font-medium leading-6 col-span-2 text-gray-900">
+                <dt className="text-sm font-medium leading-6 col-span-2 ">
                   Placing Number
                 </dt>
-                <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0 text-start align-">
+                <dd className="mt-1 text-sm leading-6sm:col-span-2 sm:mt-0 text-start align-">
                   {transactionData.placing_number}
                 </dd>
               </div>

@@ -45,7 +45,7 @@ const StudentCard: React.FC<StudentCardProps> = ({
     <div className="flex">
       <div
         className={cn(
-          "dark:text-black space-y-2 mb-10 mx-5 mt-5 h-[810px] py-5 w-[920px]",
+          "dark:text-black space-y-2 mb-10 mx-5 mt-5 h-[870px] py-5 w-[920px]",
           cardBgColor,
           "justify-center items-center",
           fontClass
@@ -109,14 +109,16 @@ const StudentCard: React.FC<StudentCardProps> = ({
             )}
           </div>
           <div className="pr-8 pt-5 flex text-lg font-semibold gap-2">
-            Book Card Photo:
+            Book Card Photo Approval Status:{" "}
             <ApprovalStatus status={account.isBookCardPhotoApproved} />
           </div>
         </div>
       </div>
       <div className="w-[320px]">
         <AutoReloadWrapper>
-          <BookTransactionByAccountId />
+          <div className="mt-5">
+            <BookTransactionByAccountId />
+          </div>
         </AutoReloadWrapper>
       </div>
     </div>

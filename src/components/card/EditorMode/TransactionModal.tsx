@@ -17,7 +17,6 @@ import {
 } from "@/components/ui/select";
 import { AccessionSuggestion, TransactionData } from "@/types";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { useAutoReload } from "./AutoReloadWrapper";
 import { Label } from "recharts";
 
 interface TransactionModalProps {
@@ -30,7 +29,8 @@ interface TransactionModalProps {
   handleAccessionSuggestionClick: (suggestion: AccessionSuggestion) => void;
   onSubmit: () => Promise<void>;
   onCancel: () => void;
-  selectedAction: "Addition" | "Borrowed" | "Returned" | "Extended" | null;
+  selectedAction: "Addition" | "Borrowed" | "Returned" | "Extended" | "Clearance" | null;
+  isFixedTransaction?: boolean;
 }
 
 const TransactionModal: React.FC<TransactionModalProps> = ({
@@ -44,8 +44,20 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
   onSubmit,
   onCancel,
   selectedAction,
+  isFixedTransaction = false,
 }) => {
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (isFixedTransaction) {
+      setTransactionData(prev => ({
+        ...prev,
+        accession_number: "18031",
+        status: "CLEARANCE",
+        transaction_date: new Date().toISOString().split('T')[0]
+      }));
+    }
+  }, [isFixedTransaction, setTransactionData]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -98,7 +110,9 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
     >
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Enter Book Record Details</DialogTitle>
+          <DialogTitle>
+            {isFixedTransaction ? "Clearance Record" : "Enter Book Record Details"}
+          </DialogTitle>
         </DialogHeader>
         {error && (
           <Alert variant="destructive">
@@ -116,6 +130,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
               }));
               handleAccessionSuggestionClick({ accession_number: value });
             }}
+            disabled={isFixedTransaction}
           >
             <SelectTrigger>
               <SelectValue placeholder="Select Accession Number" />
@@ -128,18 +143,19 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
               ))}
             </SelectContent>
           </Select>
-          <div className="hidden">
+          <div>
             <Select
               value={transactionData.status}
               onValueChange={(value) =>
                 setTransactionData((prev) => ({ ...prev, status: value }))
               }
-              disabled
+              disabled={isFixedTransaction}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select Status" />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="CLEARANCE">CLEARANCE</SelectItem>
                 <SelectItem value="BORROWED">BORROWED</SelectItem>
                 <SelectItem value="RETURNED">RETURNED</SelectItem>
                 <SelectItem value="EXTENDED">EXTENDED</SelectItem>
@@ -149,7 +165,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2 text-xs mt-3 font-bold text-center">
-              This will be the date book borrowed
+              {isFixedTransaction ? "Clearance Date" : "This will be the date book borrowed"}
             </div>
             <div className="space-y-2">
               <Label>Transaction Date</Label>
@@ -162,6 +178,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
                     transaction_date: e.target.value,
                   }))
                 }
+                disabled={isFixedTransaction}
               />
             </div>
           </div>

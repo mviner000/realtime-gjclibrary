@@ -9,6 +9,7 @@ import { X, Search, ChevronLeft, ChevronRight } from 'lucide-react'
 import { AccountType } from '../types'
 import { api } from '../../convex/_generated/api'
 import useClickOutside from '@/hooks/useClickOutside';
+import Link from 'next/link';
 
 const DEBOUNCE_MS = 300;
 
@@ -106,7 +107,7 @@ export default function Component() {
   })
 
   return (
-    <div className="w-full max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 pb-10">
+    <div className="w-full max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
       <div ref={searchRef} className="relative">
         <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-2">
           <div className="relative flex-1">
@@ -135,7 +136,7 @@ export default function Component() {
         </form>
 
         {showSuggestions && suggestions && suggestions.length > 0 && (
-          <div className="absolute w-full bg-white mt-1 rounded-md shadow-lg border border-gray-200 z-10 max-h-60 overflow-y-auto">
+          <div className="absolute w-full bg-white  mt-1 rounded-md shadow-lg border border-gray-200 z-10 max-h-60 overflow-y-auto">
             {suggestions.map((account) => (
               <button
                 key={account._id}
@@ -143,7 +144,7 @@ export default function Component() {
                   setSearchTerm(account.school_id.toString())
                   setShowSuggestions(false)
                 }}
-                className="w-full px-4 py-2 text-left hover:bg-gray-100 cursor-pointer"
+                className="w-full px-4 py-2 text-left dark:text-black hover:bg-gray-100 cursor-pointer"
               >
                 {account.school_id} - {account.first_name} {account.last_name}
               </button>
@@ -166,22 +167,23 @@ export default function Component() {
 
               <div className="space-y-4">
                 {searchResults.accounts.map((account) => (
-                  <div
-                    key={account._id}
-                    className="p-4 border rounded-lg hover:bg-gray-50"
-                  >
-                    <h3 className="font-medium">
-                      {account.first_name} {account.middle_name} {account.last_name}
-                    </h3>
-                    <p className="text-sm text-gray-600">
-                      School ID: {account.school_id}
-                    </p>
-                    {account.role && (
-                      <p className="text-sm text-gray-600">
-                        {account.role}
-                        {account.department && ` - ${account.department}`}
-                      </p>
-                    )}
+                  <div key={account._id} className="block">
+                    <Link href={`/student/${account.school_id}`}>
+                      <div className="p-4 border rounded-lg hover:bg-gray-50 hover:text-gray-600 hover:cursor-pointer">
+                        <h3 className="font-medium">
+                          {account.first_name} {account.middle_name} {account.last_name}
+                        </h3>
+                        <p className="text-sm text-gray-600">
+                          School ID: {account.school_id}
+                        </p>
+                        {account.role && (
+                          <p className="text-sm text-gray-600">
+                            {account.role}
+                            {account.department && ` - ${account.department}`} • {account.course} • {account.year_level}
+                          </p>
+                        )}
+                      </div>
+                    </Link>
                   </div>
                 ))}
               </div>

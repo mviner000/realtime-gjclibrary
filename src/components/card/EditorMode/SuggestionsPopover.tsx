@@ -37,12 +37,12 @@ const SuggestionPopover: React.FC<SuggestionPopoverProps> = ({
         sideOffset={5}
         onInteractOutside={onClose}
       >
-        <ul className="max-h-60 overflow-auto">
+        <ul className="max-h-[23rem] overflow-auto">
           {suggestions.map((suggestion, index) => (
             <li
               key={index}
               onClick={() => onSuggestionClick(suggestion)}
-              className="px-3 py-2 hover:bg-gray-100 cursor-pointer"
+              className="px-3 py-2 hover:bg-gray-100 hover:dark:bg-gray-100/30 cursor-pointer"
             >
               {suggestion.callno} - {suggestion.title}
             </li>
