@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Attendance } from "@/types/attendance";
+import { env } from "@/env";
 
 export default function AttendanceEditor() {
   const [records, setRecords] = useState<Attendance[]>([]);
@@ -10,7 +11,7 @@ export default function AttendanceEditor() {
   const [status, setStatus] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
 
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+  const API_URL = env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
   const PURPOSE_OPTIONS = [
     "transaction",

@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { Note, WebSocketMessage } from "@/types/note";
+import { env } from "process";
 
 export default function NotesViewer() {
   const [notes, setNotes] = useState<Note[]>([]);
@@ -8,8 +9,8 @@ export default function NotesViewer() {
   const reconnectTimeoutRef = useRef<NodeJS.Timeout>();
   const isComponentMounted = useRef(true);
 
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-  const WS_URL = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:8000";
+  const API_URL = env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+  const WS_URL = env.NEXT_PUBLIC_WS_URL || "ws://localhost:8000";
 
   useEffect(() => {
     isComponentMounted.current = true;

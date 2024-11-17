@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Note } from "@/types/note";
+import { env } from "@/env";
 
 export default function NotesEditor() {
   const [notes, setNotes] = useState<Note[]>([]);
@@ -9,7 +10,7 @@ export default function NotesEditor() {
   const [content, setContent] = useState("");
   const [editingId, setEditingId] = useState<number | null>(null);
 
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+  const API_URL = env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
   useEffect(() => {
     fetchNotes();

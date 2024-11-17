@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 import { WebSocketService } from "@/utils/websocketService";
+import { env } from "@/env";
 
 interface Attendance {
   id: string;
@@ -36,8 +37,8 @@ export default function AttendanceViewer() {
   const [websocketService, setWebsocketService] =
     useState<WebSocketService | null>(null);
 
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-  const WS_URL = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:8000";
+  const API_URL = env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+  const WS_URL = env.NEXT_PUBLIC_WS_URL || "ws://localhost:8000";
 
   useEffect(() => {
     const initializeWebSocket = () => {
