@@ -2,14 +2,11 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Attendance, WebSocketMessage } from "@/types/attendance";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 
 export default function AttendanceViewer() {
   const [records, setRecords] = useState<Attendance[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout>();
@@ -20,7 +17,7 @@ export default function AttendanceViewer() {
 
   useEffect(() => {
     isComponentMounted.current = true;
-    fetchRecords(currentPage);
+    fetchRecords();
     setupWebSocket();
 
     return () => {
@@ -33,31 +30,31 @@ export default function AttendanceViewer() {
         wsRef.current = null;
       }
     };
-  }, [currentPage]);
+  }, []);
 
-  const fetchRecords = async (page: number) => {
+  const fetchRecords = async () => {
     try {
-      setIsLoading(true);
-      const response = await fetch(`${API_URL}/v2/attendance?page=${page}`);
+      const response = await fetch(`${API_URL}/v2/attendance`);
       const data = await response.json();
 
-      if (isComponentMounted.current) {
-        // Sort records by the latest time_in_date
-        const sortedRecords = data.items.sort(
-          (a: Attendance, b: Attendance) => {
-            const aDate = new Date(a.time_in_date || a.date);
-            const bDate = new Date(b.time_in_date || b.date);
-            return bDate.getTime() - aDate.getTime();
-          }
-        );
-
-        setRecords(sortedRecords);
-        setTotalPages(Math.ceil(data.total / 20));
+      // Add type checking and validation
+      if (!Array.isArray(data)) {
+        console.error("Expected array of records but got:", typeof data);
+        setRecords([]);
+        return;
       }
+
+      // Sort records by the latest time_in_date
+      const sortedRecords = [...data].sort((a: Attendance, b: Attendance) => {
+        const aDate = new Date(a.time_in_date || a.date);
+        const bDate = new Date(b.time_in_date || b.date);
+        return bDate.getTime() - aDate.getTime();
+      });
+
+      setRecords(sortedRecords);
     } catch (error) {
       console.error("Error fetching attendance records:", error);
-    } finally {
-      setIsLoading(false);
+      setRecords([]);
     }
   };
 
@@ -83,15 +80,13 @@ export default function AttendanceViewer() {
 
       switch (data.action) {
         case "created":
-          if (currentPage === 1) {
-            setRecords((prevRecords) => {
-              const exists = prevRecords.some(
-                (record) => record.id === data.attendance?.id
-              );
-              if (exists) return prevRecords;
-              return [data.attendance!, ...prevRecords.slice(0, 19)];
-            });
-          }
+          setRecords((prevRecords) => {
+            const exists = prevRecords.some(
+              (record) => record.id === data.attendance?.id
+            );
+            if (exists) return prevRecords;
+            return [data.attendance!, ...prevRecords];
+          });
           break;
 
         case "updated":
@@ -137,76 +132,52 @@ export default function AttendanceViewer() {
           <Loader2 className="w-8 h-8 animate-spin" />
         </div>
       ) : (
-        <>
-          <div className="grid gap-4">
-            {records.map((record) => (
-              <Card key={`viewer-${record.id}`} className="p-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <h3 className="font-semibold">Student Information</h3>
-                    <p>ID: {record.school_id}</p>
-                    <p>
-                      Name: {record.first_name} {record.middle_name}{" "}
-                      {record.last_name}
-                    </p>
-                    <p>Course: {record.course || "N/A"}</p>
-                    <p>Year Level: {record.year_level || "N/A"}</p>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold">Visit Details</h3>
-                    <p>Purpose: {record.purpose}</p>
-                    <p>Status: {record.status}</p>
-                    <p>Classification: {record.classification || "N/A"}</p>
-                    <p>
-                      Time In:{" "}
-                      {record.time_in_date
-                        ? new Date(record.time_in_date).toLocaleString()
-                        : "N/A"}
-                    </p>
-                    {record.time_out_date && (
-                      <p>
-                        Time Out:{" "}
-                        {new Date(record.time_out_date).toLocaleString()}
-                      </p>
-                    )}
-                  </div>
+        <div className="grid gap-4">
+          {records.map((record) => (
+            <Card key={`viewer-${record.id}`} className="p-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <h3 className="font-semibold">Student Information</h3>
+                  <p>ID: {record.school_id}</p>
+                  <p>
+                    Name: {record.first_name} {record.middle_name}{" "}
+                    {record.last_name}
+                  </p>
+                  <p>Course: {record.course || "N/A"}</p>
+                  <p>Year Level: {record.year_level || "N/A"}</p>
                 </div>
-                {record.baggage_number !== null && (
-                  <div className="mt-4 p-2 bg-gray-50 rounded">
-                    <h3 className="font-semibold">Baggage Information</h3>
-                    <p>Number: {record.baggage_number}</p>
+                <div>
+                  <h3 className="font-semibold">Visit Details</h3>
+                  <p>Purpose: {record.purpose}</p>
+                  <p>Status: {record.status}</p>
+                  <p>Classification: {record.classification || "N/A"}</p>
+                  <p>
+                    Time In:{" "}
+                    {record.time_in_date
+                      ? new Date(record.time_in_date).toLocaleString()
+                      : "N/A"}
+                  </p>
+                  {record.time_out_date && (
                     <p>
-                      Status:{" "}
-                      {record.baggage_returned ? "Returned" : "Not Returned"}
+                      Time Out:{" "}
+                      {new Date(record.time_out_date).toLocaleString()}
                     </p>
-                  </div>
-                )}
-              </Card>
-            ))}
-          </div>
-
-          <div className="flex justify-center gap-2 mt-4">
-            <Button
-              variant="outline"
-              onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-              disabled={currentPage === 1}
-            >
-              Previous
-            </Button>
-            <span className="py-2 px-4">
-              Page {currentPage} of {totalPages}
-            </span>
-            <Button
-              variant="outline"
-              onClick={() =>
-                setCurrentPage((prev) => Math.min(totalPages, prev + 1))
-              }
-              disabled={currentPage === totalPages}
-            >
-              Next
-            </Button>
-          </div>
-        </>
+                  )}
+                </div>
+              </div>
+              {record.baggage_number !== null && (
+                <div className="mt-4 p-2 bg-gray-50 dark:text-black dark:bg-gray-400 rounded">
+                  <h3 className="font-semibold">Baggage Information</h3>
+                  <p>Number: {record.baggage_number}</p>
+                  <p>
+                    Status:{" "}
+                    {record.baggage_returned ? "Returned" : "Not Returned"}
+                  </p>
+                </div>
+              )}
+            </Card>
+          ))}
+        </div>
       )}
     </div>
   );

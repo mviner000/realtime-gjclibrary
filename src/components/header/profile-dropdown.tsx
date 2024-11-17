@@ -16,7 +16,7 @@ import { CurrentUser } from "@/utils/getCurrentUser";
 import { useEffect, useState } from "react";
 import QuickLoginForm from "../QuickLoginForm";
 
-const NEXT_AVATAR_API_AURL = "api/avatar";
+const NEXT_AVATAR_API_AURL = "/api/avatar";
 
 export function ProfileDropdown({ user }: { user: CurrentUser }) {
   const navLinks = user.is_staff
@@ -44,7 +44,7 @@ export function ProfileDropdown({ user }: { user: CurrentUser }) {
                 <img
                   src={avatarUrl}
                   className="shadow-lg w-full rounded-full"
-                  style={{ objectFit: 'cover', width: '100%', height: 'auto' }}
+                  style={{ objectFit: "cover", width: "100%", height: "auto" }}
                   alt="User Avatar"
                 />
               ) : (

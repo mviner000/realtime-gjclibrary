@@ -35,10 +35,13 @@ export default function AttendanceEditor() {
     try {
       const response = await fetch(`${API_URL}/v2/attendance`);
       const data = (await response.json()) as Attendance[];
-      const uniqueRecords = Array.from(
-        new Map(data.map((record: Attendance) => [record.id, record])).values()
-      ) as Attendance[];
-      setRecords(uniqueRecords);
+      // Sort records by the latest time_in_date
+      const sortedRecords = data.sort((a: Attendance, b: Attendance) => {
+        const aDate = new Date(a.time_in_date || a.date);
+        const bDate = new Date(b.time_in_date || b.date);
+        return bDate.getTime() - aDate.getTime();
+      });
+      setRecords(sortedRecords);
     } catch (error) {
       console.error("Error fetching attendance records:", error);
     }
@@ -159,7 +162,10 @@ export default function AttendanceEditor() {
         {records.map((record) => (
           <div key={record.id} className="border p-4 rounded">
             <h3 className="font-semibold">School ID: {record.school_id}</h3>
-            <p className="mt-2">Purpose: {record.purpose}</p>
+            <p className="mt-2">
+              Name: {record.first_name} {record.middle_name} {record.last_name}
+            </p>
+            <p>Purpose: {record.purpose}</p>
             <p>Status: {record.status}</p>
             {record.baggage_number && (
               <p>Baggage Number: {record.baggage_number}</p>
