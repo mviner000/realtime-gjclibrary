@@ -1,129 +1,127 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { Attendance, WebSocketMessage } from "@/types/attendance";
+import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
+import { WebSocketService } from "@/utils/websocketService";
+
+interface Attendance {
+  id: string;
+  school_id: string;
+  first_name: string;
+  middle_name?: string;
+  last_name: string;
+  course?: string;
+  year_level?: string;
+  purpose: string;
+  status: string;
+  date?: string;
+  time_in_date?: string;
+  time_out_date?: string;
+  classification?: string;
+  has_already_timed_in: boolean;
+  has_already_timed_out: boolean;
+  baggage_number?: number;
+  baggage_returned: boolean;
+}
+
+interface WebSocketMessage {
+  action: "created" | "updated" | "deleted";
+  attendance: Attendance;
+}
 
 export default function AttendanceViewer() {
   const [records, setRecords] = useState<Attendance[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const wsRef = useRef<WebSocket | null>(null);
-  const reconnectTimeoutRef = useRef<NodeJS.Timeout>();
-  const isComponentMounted = useRef(true);
+  const [isLoading, setIsLoading] = useState(true);
+  const [websocketService, setWebsocketService] =
+    useState<WebSocketService | null>(null);
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
   const WS_URL = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:8000";
 
   useEffect(() => {
-    isComponentMounted.current = true;
-    fetchRecords();
-    setupWebSocket();
+    const initializeWebSocket = () => {
+      const ws = new WebSocketService(`${WS_URL}/ws/attendance/`);
 
-    return () => {
-      isComponentMounted.current = false;
-      if (reconnectTimeoutRef.current) {
-        clearTimeout(reconnectTimeoutRef.current);
-      }
-      if (wsRef.current) {
-        wsRef.current.close();
-        wsRef.current = null;
-      }
+      const handleMessage = (data: WebSocketMessage) => {
+        if (!data.attendance) return;
+
+        setRecords((prevRecords) => {
+          switch (data.action) {
+            case "created": {
+              const exists = prevRecords.some(
+                (record) => record.id === data.attendance.id
+              );
+              if (exists) return prevRecords;
+              return [data.attendance, ...prevRecords];
+            }
+
+            case "updated": {
+              const recordExists = prevRecords.some(
+                (record) => record.id === data.attendance.id
+              );
+              if (!recordExists) return prevRecords;
+              return prevRecords.map((record) =>
+                record.id === data.attendance.id ? data.attendance : record
+              );
+            }
+
+            case "deleted":
+              return prevRecords.filter(
+                (record) => record.id !== data.attendance.id
+              );
+
+            default:
+              return prevRecords;
+          }
+        });
+      };
+
+      ws.addMessageHandler(handleMessage);
+      setWebsocketService(ws);
+
+      return () => {
+        ws.removeMessageHandler(handleMessage);
+        ws.disconnect();
+      };
     };
-  }, []);
 
-  const fetchRecords = async () => {
-    try {
-      const response = await fetch(`${API_URL}/v2/attendance`);
-      const data = await response.json();
+    const fetchRecords = async () => {
+      try {
+        setIsLoading(true);
+        const response = await fetch(`${API_URL}/v2/attendance`);
+        const data = await response.json();
 
-      // Add type checking and validation
-      if (!Array.isArray(data)) {
-        console.error("Expected array of records but got:", typeof data);
+        if (!Array.isArray(data)) {
+          console.error("Expected array of records but got:", typeof data);
+          setRecords([]);
+          return;
+        }
+
+        const sortedRecords = [...data].sort((a: Attendance, b: Attendance) => {
+          const aDate = new Date(a.time_in_date || a.date || 0);
+          const bDate = new Date(b.time_in_date || b.date || 0);
+          return bDate.getTime() - aDate.getTime();
+        });
+
+        setRecords(sortedRecords);
+      } catch (error) {
+        console.error("Error fetching attendance records:", error);
         setRecords([]);
-        return;
-      }
-
-      // Sort records by the latest time_in_date
-      const sortedRecords = [...data].sort((a: Attendance, b: Attendance) => {
-        const aDate = new Date(a.time_in_date || a.date);
-        const bDate = new Date(b.time_in_date || b.date);
-        return bDate.getTime() - aDate.getTime();
-      });
-
-      setRecords(sortedRecords);
-    } catch (error) {
-      console.error("Error fetching attendance records:", error);
-      setRecords([]);
-    }
-  };
-
-  const setupWebSocket = () => {
-    if (!isComponentMounted.current) return;
-
-    if (wsRef.current?.readyState === WebSocket.OPEN) {
-      return;
-    }
-
-    const ws = new WebSocket(`${WS_URL}/ws/attendance/`);
-    wsRef.current = ws;
-
-    ws.onopen = () => {
-      console.log("WebSocket connected");
-    };
-
-    ws.onmessage = (event) => {
-      if (!isComponentMounted.current) return;
-
-      const data = JSON.parse(event.data) as WebSocketMessage;
-      if (!data.attendance) return;
-
-      switch (data.action) {
-        case "created":
-          setRecords((prevRecords) => {
-            const exists = prevRecords.some(
-              (record) => record.id === data.attendance?.id
-            );
-            if (exists) return prevRecords;
-            return [data.attendance!, ...prevRecords];
-          });
-          break;
-
-        case "updated":
-          setRecords((prevRecords) => {
-            const recordExists = prevRecords.some(
-              (record) => record.id === data.attendance?.id
-            );
-            if (!recordExists) return prevRecords;
-            return prevRecords.map((record) =>
-              record.id === data.attendance?.id ? data.attendance! : record
-            );
-          });
-          break;
-
-        case "deleted":
-          setRecords((prevRecords) =>
-            prevRecords.filter((record) => record.id !== data.attendance?.id)
-          );
-          break;
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    ws.onerror = (error) => {
-      console.error("WebSocket error:", error);
-    };
+    // Initialize WebSocket and fetch initial records
+    const cleanup = initializeWebSocket();
+    fetchRecords();
 
-    ws.onclose = () => {
-      console.log("WebSocket disconnected");
-      wsRef.current = null;
-
-      if (isComponentMounted.current) {
-        reconnectTimeoutRef.current = setTimeout(() => {
-          setupWebSocket();
-        }, 3000);
-      }
+    // Cleanup on unmount
+    return () => {
+      cleanup();
     };
-  };
+  }, [API_URL, WS_URL]);
 
   return (
     <div className="space-y-4">
