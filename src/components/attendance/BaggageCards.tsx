@@ -21,10 +21,14 @@ export default function BaggageCards() {
 
   const API_URL = env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
-  // Get all records with baggage for today
-  const recordsWithBaggage = allRecords.filter(
-    (record) => record.baggage_number !== null
-  );
+  // Get all records with baggage for today, sorted by latest time_in
+  const recordsWithBaggage = allRecords
+    .filter((record) => record.baggage_number !== null)
+    .sort((a, b) => {
+      const aTime = new Date(a.time_in_date || 0).getTime();
+      const bTime = new Date(b.time_in_date || 0).getTime();
+      return bTime - aTime; // Sort in descending order (latest first)
+    });
 
   // Show "all returned" card only when there are baggage records for today but none are unreturned
   const allBaggageReturned =
@@ -91,8 +95,16 @@ export default function BaggageCards() {
       const containerWidth = containerRef.current?.offsetWidth || 0;
       const cardWidth = 180; // Width of each card (160px) + gap (20px)
       const cardsPerView = Math.max(2, Math.floor(containerWidth / cardWidth));
+
+      // Sort unreturned records by time_in before slicing
+      const sortedRecords = [...unreturnedRecords].sort((a, b) => {
+        const aTime = new Date(a.time_in_date || 0).getTime();
+        const bTime = new Date(b.time_in_date || 0).getTime();
+        return bTime - aTime;
+      });
+
       setVisibleRecords(
-        unreturnedRecords.slice(startIndex, startIndex + cardsPerView)
+        sortedRecords.slice(startIndex, startIndex + cardsPerView)
       );
     };
 
@@ -149,7 +161,7 @@ export default function BaggageCards() {
       <ScrollArea className="w-full whitespace-nowrap rounded-md border border-gray-200">
         <div className="flex space-x-5 p-4">
           {allBaggageReturned && <StaticBaggageCard />}
-          {unreturnedRecords.map((record) => (
+          {visibleRecords.map((record) => (
             <ConfirmationDialog
               key={record.id}
               trigger={

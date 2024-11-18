@@ -13,13 +13,5 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <main>
-      <GJCLeftSideBar />
-      <LeftSideBarLayoutWrapper>
-        {/* <SettingsBreadcrumb /> */}
-        {children}
-      </LeftSideBarLayoutWrapper>
-    </main>
-  );
+  return <main>{children}</main>;
 }

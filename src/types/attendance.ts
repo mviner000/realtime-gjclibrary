@@ -24,3 +24,17 @@ export interface WebSocketMessage {
   attendance?: Attendance;
   message?: string;
 }
+
+export type FormData = {
+  schoolId: string;
+  purpose: string;
+  hasBaggage: boolean | "";
+};
+
+export type SubmissionData = {
+  first_name?: string;
+  last_name?: string;
+  baggage_number?: number;
+  school_id: string;
+  purpose: string;
+};
