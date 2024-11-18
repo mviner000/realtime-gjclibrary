@@ -2,9 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { WebSocketService } from "@/utils/websocketService";
 import { env } from "@/env";
+import { Toaster } from "@/components/ui/toaster";
+import { useToast } from "@/components/ui/use-toast";
+import { Badge } from "@/components/ui/badge";
 
 interface Attendance {
   id: string;
@@ -29,16 +33,60 @@ interface Attendance {
 interface WebSocketMessage {
   action: "created" | "updated" | "deleted";
   attendance: Attendance;
+  baggage_update?: {
+    number: number;
+    is_available: boolean;
+  };
 }
 
 export default function AttendanceViewer() {
   const [records, setRecords] = useState<Attendance[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [updatingBaggage, setUpdatingBaggage] = useState<string | null>(null);
   const [websocketService, setWebsocketService] =
     useState<WebSocketService | null>(null);
+  const { toast } = useToast();
 
   const API_URL = env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
   const WS_URL = env.NEXT_PUBLIC_WS_URL || "ws://localhost:8000";
+
+  const handleBaggageUpdate = async (record: Attendance) => {
+    if (!record.baggage_number) return;
+
+    try {
+      setUpdatingBaggage(record.id);
+
+      const response = await fetch(`${API_URL}/v2/attendance/${record.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...record,
+          baggage_returned: !record.baggage_returned,
+          status: "time_out",
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update baggage status");
+      }
+
+      toast({
+        title: "Success",
+        description: "Baggage status updated successfully",
+      });
+    } catch (error) {
+      console.error("Error updating baggage status:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update baggage status",
+        variant: "destructive",
+      });
+    } finally {
+      setUpdatingBaggage(null);
+    }
+  };
 
   useEffect(() => {
     const initializeWebSocket = () => {
@@ -114,70 +162,130 @@ export default function AttendanceViewer() {
       }
     };
 
-    // Initialize WebSocket and fetch initial records
     const cleanup = initializeWebSocket();
     fetchRecords();
 
-    // Cleanup on unmount
     return () => {
       cleanup();
     };
   }, [API_URL, WS_URL]);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 p-4">
       {isLoading ? (
         <div className="flex justify-center items-center py-8">
           <Loader2 className="w-8 h-8 animate-spin" />
         </div>
       ) : (
-        <div className="grid gap-4">
+        <div className="grid gap-4 grid-cols-1">
           {records.map((record) => (
             <Card key={`viewer-${record.id}`} className="p-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-4">
                 <div>
-                  <h3 className="font-semibold">Student Information</h3>
-                  <p>ID: {record.school_id}</p>
-                  <p>
-                    Name: {record.first_name} {record.middle_name}{" "}
-                    {record.last_name}
+                  <h3 className="font-semibold text-lg mb-2">
+                    Student Information
+                  </h3>
+                  <p className="text-sm">
+                    <span className="font-medium">ID:</span> {record.school_id}
                   </p>
-                  <p>Course: {record.course || "N/A"}</p>
-                  <p>Year Level: {record.year_level || "N/A"}</p>
+                  <p className="text-sm">
+                    <span className="font-medium">Name:</span>{" "}
+                    {record.first_name} {record.middle_name} {record.last_name}
+                  </p>
+                  <p className="text-sm">
+                    <span className="font-medium">Course:</span>{" "}
+                    {record.course || "N/A"}
+                  </p>
+                  <p className="text-sm">
+                    <span className="font-medium">Year Level:</span>{" "}
+                    {record.year_level || "N/A"}
+                  </p>
                 </div>
                 <div>
-                  <h3 className="font-semibold">Visit Details</h3>
-                  <p>Purpose: {record.purpose}</p>
-                  <p>Status: {record.status}</p>
-                  <p>Classification: {record.classification || "N/A"}</p>
-                  <p>
-                    Time In:{" "}
-                    {record.time_in_date
-                      ? new Date(record.time_in_date).toLocaleString()
-                      : "N/A"}
-                  </p>
-                  {record.time_out_date && (
-                    <p>
-                      Time Out:{" "}
-                      {new Date(record.time_out_date).toLocaleString()}
+                  <h3 className="font-semibold text-lg mb-2">Visit Details</h3>
+                  <div className="space-y-2">
+                    <p className="text-sm">
+                      <span className="font-medium">Purpose:</span>{" "}
+                      {record.purpose}
                     </p>
-                  )}
+                    {/* <p className="text-sm">
+                    <span className="font-medium">Status:</span>{" "}
+                    <Badge
+                      variant={
+                        record.status === "time_out" ? "secondary" : "default"
+                      }
+                    >
+                      {record.status}
+                    </Badge>
+                  </p> */}
+                    <p className="text-sm">
+                      <span className="font-medium">Classification:</span>{" "}
+                      <Badge variant="outline">
+                        {record.classification || "N/A"}
+                      </Badge>
+                    </p>
+                    <p className="text-sm">
+                      <span className="font-medium">Time In:</span>{" "}
+                      {record.time_in_date
+                        ? new Date(record.time_in_date).toLocaleString()
+                        : "N/A"}
+                    </p>
+                    {record.time_out_date && (
+                      <p className="text-sm">
+                        <span className="font-medium">Time Out:</span>{" "}
+                        {new Date(record.time_out_date).toLocaleString()}
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
               {record.baggage_number !== null && (
-                <div className="mt-4 p-2 bg-gray-50 dark:text-black dark:bg-gray-400 rounded">
-                  <h3 className="font-semibold">Baggage Information</h3>
-                  <p>Number: {record.baggage_number}</p>
-                  <p>
-                    Status:{" "}
-                    {record.baggage_returned ? "Returned" : "Not Returned"}
-                  </p>
+                <div className="mt-4 p-3 bg-secondary rounded-md">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                    <div>
+                      <h3 className="font-semibold text-lg mb-1">
+                        Baggage Information
+                      </h3>
+                      <p className="text-sm">
+                        <span className="font-medium">Number:</span>{" "}
+                        {record.baggage_number}
+                      </p>
+                      <p className="text-sm">
+                        <span className="font-medium">Status:</span>{" "}
+                        <Badge
+                          variant={
+                            record.baggage_returned ? "default" : "destructive"
+                          }
+                        >
+                          {record.baggage_returned
+                            ? "Returned"
+                            : "Not Returned"}
+                        </Badge>
+                      </p>
+                    </div>
+                    <Button
+                      variant={record.baggage_returned ? "outline" : "default"}
+                      size="sm"
+                      onClick={() => handleBaggageUpdate(record)}
+                      disabled={updatingBaggage === record.id}
+                      className="mt-2 sm:mt-0"
+                    >
+                      {updatingBaggage === record.id ? (
+                        <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                      ) : record.baggage_returned ? (
+                        "Mark as Not Returned"
+                      ) : (
+                        "Mark as Returned"
+                      )}
+                    </Button>
+                  </div>
                 </div>
               )}
             </Card>
           ))}
         </div>
       )}
+      <Toaster />
     </div>
   );
 }
