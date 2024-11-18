@@ -38,3 +38,10 @@ export type SubmissionData = {
   school_id: string;
   purpose: string;
 };
+
+export interface UserData {
+  school_id: string;
+  first_name: string;
+  middle_name: string;
+  last_name: string;
+}

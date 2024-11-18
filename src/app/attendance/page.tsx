@@ -1,19 +1,10 @@
-import { DashReloader } from "@/components/dashboard/DashReloader";
-import getCurrentUser from "@/utils/getCurrentUser";
-import { redirect } from "next/navigation";
-import LibraryLogin from "./_components/LibraryLogin";
-import StepAttendanceForm from "./_components/StepAttendanceForm";
+import InputScanner from "./_components/InputScanner";
 
-const DashboardPage: React.FC = async () => {
-  const user = await getCurrentUser();
-
-  if (!user) redirect("/login");
-
+export default async function AttendancePage() {
   return (
-    <div className="mt-16">
-      <StepAttendanceForm />
+    <div className="relative flex h-full min-h-[calc(100vh-76px)] w-full flex-col flex-wrap justify-center gap-8 bg-[url(/images/GenSimeonBldg.jpg)] bg-cover bg-top text-white">
+      <div className="absolute z-[1] h-full w-full bg-gradient-to-r from-customGreen via-customGreen/60 to-customGreen/0"></div>
+      <InputScanner />
     </div>
   );
-};
-
-export default DashboardPage;
+}
