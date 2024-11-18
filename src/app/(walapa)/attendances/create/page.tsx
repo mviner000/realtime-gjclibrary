@@ -11,7 +11,6 @@ export default function AttendancePage() {
           <AttendanceEditor />
         </div>
         <div>
-          <h2 className="text-2xl font-bold mb-4">Live Attendance</h2>
           <AttendanceViewer />
         </div>
       </div>

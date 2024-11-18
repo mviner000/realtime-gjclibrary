@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
+import { ChevronUpSquareIcon, Loader2 } from "lucide-react";
 import { env } from "@/env";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/components/ui/use-toast";
@@ -77,7 +77,7 @@ export default function AttendanceViewer() {
           <AccordionTrigger className="px-6 py-4 hover:no-underline">
             <div className="flex justify-between items-center w-full text-left">
               <div className="flex items-center space-x-4">
-                <Avatar className="h-16 w-16">
+                <Avatar className="h-12 w-12">
                   <AvatarImage
                     src={record.current_avatar || "/images/def-avatar.svg"}
                     alt={record.first_name}
@@ -200,6 +200,13 @@ export default function AttendanceViewer() {
 
   return (
     <div className="container mx-auto p-4 space-y-4">
+      <div className="w-full flex justify-between items-center">
+        <h2 className="text-2xl font-bold my-4">Live Attendances</h2>
+        <Button variant="ghost" className="border border-gray-300">
+          <ChevronUpSquareIcon className="mr-1" />
+          Return All Baggages
+        </Button>
+      </div>
       {isLoading ? (
         <div className="flex justify-center items-center py-8">
           <Loader2 className="w-8 h-8 animate-spin" />

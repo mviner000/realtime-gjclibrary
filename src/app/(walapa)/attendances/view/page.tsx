@@ -7,7 +7,6 @@ export default function AttendancePage() {
     <div className="container mx-auto p-4">
       <BaggageCards />
       <div>
-        <h2 className="text-2xl font-bold my-4">Live Attendance</h2>
         <AttendanceViewer />
       </div>
     </div>
