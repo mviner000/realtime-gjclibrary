@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, Loader2 } from "lucide-react";
-import { WebSocketService } from "@/utils/websocketService";
+import { Loader2 } from "lucide-react";
 import { env } from "@/env";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/components/ui/use-toast";
@@ -17,47 +16,15 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/custom-accordion";
-
-interface Attendance {
-  id: string;
-  school_id: string;
-  current_avatar: string | null;
-  first_name: string;
-  middle_name?: string;
-  last_name: string;
-  course?: string;
-  year_level?: string;
-  purpose: string;
-  status: string;
-  date?: string;
-  time_in_date?: string;
-  time_out_date?: string;
-  classification?: string;
-  has_already_timed_in: boolean;
-  has_already_timed_out: boolean;
-  baggage_number?: number;
-  baggage_returned: boolean;
-}
-
-interface WebSocketMessage {
-  action: "created" | "updated" | "deleted";
-  attendance: Attendance;
-  baggage_update?: {
-    number: number;
-    is_available: boolean;
-  };
-}
+import { useAttendanceData, type Attendance } from "./useAttendanceData";
+import ConfirmationDialog from "./ConfirmationDialog";
 
 export default function AttendanceViewer() {
-  const [records, setRecords] = useState<Attendance[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { records, isLoading } = useAttendanceData(false);
   const [updatingBaggage, setUpdatingBaggage] = useState<string | null>(null);
-  const [websocketService, setWebsocketService] =
-    useState<WebSocketService | null>(null);
   const { toast } = useToast();
 
   const API_URL = env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-  const WS_URL = env.NEXT_PUBLIC_WS_URL || "ws://localhost:8000";
 
   const handleBaggageUpdate = async (record: Attendance) => {
     if (!record.baggage_number) return;
@@ -96,88 +63,6 @@ export default function AttendanceViewer() {
       setUpdatingBaggage(null);
     }
   };
-
-  useEffect(() => {
-    const initializeWebSocket = () => {
-      const ws = new WebSocketService(`${WS_URL}/ws/attendance/`);
-
-      const handleMessage = (data: WebSocketMessage) => {
-        if (!data.attendance) return;
-
-        setRecords((prevRecords) => {
-          switch (data.action) {
-            case "created": {
-              const exists = prevRecords.some(
-                (record) => record.id === data.attendance.id
-              );
-              if (exists) return prevRecords;
-              return [data.attendance, ...prevRecords];
-            }
-
-            case "updated": {
-              const recordExists = prevRecords.some(
-                (record) => record.id === data.attendance.id
-              );
-              if (!recordExists) return prevRecords;
-              return prevRecords.map((record) =>
-                record.id === data.attendance.id ? data.attendance : record
-              );
-            }
-
-            case "deleted":
-              return prevRecords.filter(
-                (record) => record.id !== data.attendance.id
-              );
-
-            default:
-              return prevRecords;
-          }
-        });
-      };
-
-      ws.addMessageHandler(handleMessage);
-      setWebsocketService(ws);
-
-      return () => {
-        ws.removeMessageHandler(handleMessage);
-        ws.disconnect();
-      };
-    };
-
-    const fetchRecords = async () => {
-      try {
-        setIsLoading(true);
-        const response = await fetch(`${API_URL}/v2/attendance`);
-        const data = await response.json();
-
-        if (!Array.isArray(data)) {
-          console.error("Expected array of records but got:", typeof data);
-          setRecords([]);
-          return;
-        }
-
-        const sortedRecords = [...data].sort((a: Attendance, b: Attendance) => {
-          const aDate = new Date(a.time_in_date || a.date || 0);
-          const bDate = new Date(b.time_in_date || b.date || 0);
-          return bDate.getTime() - aDate.getTime();
-        });
-
-        setRecords(sortedRecords);
-      } catch (error) {
-        console.error("Error fetching attendance records:", error);
-        setRecords([]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    const cleanup = initializeWebSocket();
-    fetchRecords();
-
-    return () => {
-      cleanup();
-    };
-  }, [API_URL, WS_URL]);
 
   const formatTime = (dateString?: string) => {
     if (!dateString) return "N/A";
@@ -287,19 +172,22 @@ export default function AttendanceViewer() {
                     </Badge>
                   </p>
                   {!record.baggage_returned && (
-                    <Button
-                      variant="default"
-                      size="sm"
-                      className="mt-2"
-                      onClick={() => handleBaggageUpdate(record)}
-                      disabled={updatingBaggage === record.id}
-                    >
-                      {updatingBaggage === record.id ? (
-                        <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                      ) : (
-                        "Mark as Returned"
-                      )}
-                    </Button>
+                    <ConfirmationDialog
+                      trigger={
+                        <Button variant="default" size="sm" className="mt-2">
+                          {updatingBaggage === record.id ? (
+                            <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                          ) : (
+                            "Mark as Returned"
+                          )}
+                        </Button>
+                      }
+                      title="Confirm Baggage Return"
+                      description="Are you sure you want to mark this baggage as returned? This action cannot be undone."
+                      confirmText="Mark as Returned"
+                      onConfirm={() => handleBaggageUpdate(record)}
+                      isLoading={updatingBaggage === record.id}
+                    />
                   )}
                 </div>
               )}

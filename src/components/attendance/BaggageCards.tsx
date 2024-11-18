@@ -1,176 +1,109 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { ChevronRight, ChevronLeft, Loader2 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { ChevronRight, ChevronLeft, Loader2, Check } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { WebSocketService } from "@/utils/websocketService";
+import { useAttendanceData } from "./useAttendanceData";
+import ConfirmationDialog from "./ConfirmationDialog";
+import { useToast } from "@/components/ui/use-toast";
 import { env } from "@/env";
 
-interface Attendance {
-  id: string;
-  school_id: string;
-  current_avatar: string | null;
-  first_name: string;
-  middle_name?: string;
-  last_name: string;
-  course?: string;
-  year_level?: string;
-  purpose: string;
-  status: string;
-  date?: string;
-  time_in_date?: string;
-  time_out_date?: string;
-  classification?: string;
-  has_already_timed_in: boolean;
-  has_already_timed_out: boolean;
-  baggage_number?: number;
-  baggage_returned: boolean;
-}
-
-interface WebSocketMessage {
-  action: "created" | "updated" | "deleted";
-  attendance: Attendance;
-  baggage_update?: {
-    number: number;
-    is_available: boolean;
-  };
-}
-
 export default function BaggageCards() {
-  const [records, setRecords] = useState<Attendance[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [visibleRecords, setVisibleRecords] = useState<Attendance[]>([]);
-  const [startIndex, setStartIndex] = useState<number>(0);
-  const [websocketService, setWebsocketService] =
-    useState<WebSocketService | null>(null);
+  const { records: unreturnedRecords, isLoading } = useAttendanceData(true);
+  const { records: allRecords } = useAttendanceData(false);
+  const [visibleRecords, setVisibleRecords] = useState(unreturnedRecords);
+  const [startIndex, setStartIndex] = useState(0);
+  const [updatingBaggage, setUpdatingBaggage] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const { toast } = useToast();
 
   const API_URL = env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-  const WS_URL = env.NEXT_PUBLIC_WS_URL || "ws://localhost:8000";
 
-  useEffect(() => {
-    const initializeWebSocket = () => {
-      const ws = new WebSocketService(`${WS_URL}/ws/attendance/`);
+  // Get all records with baggage for today
+  const recordsWithBaggage = allRecords.filter(
+    (record) => record.baggage_number !== null
+  );
 
-      const handleMessage = (data: WebSocketMessage) => {
-        if (!data.attendance) return;
+  // Show "all returned" card only when there are baggage records for today but none are unreturned
+  const allBaggageReturned =
+    recordsWithBaggage.length > 0 && unreturnedRecords.length === 0;
 
-        setRecords((prevRecords) => {
-          let newRecords: Attendance[];
+  const formatDate = () => {
+    const date = new Date();
+    const days = [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+    ];
+    const day = days[date.getDay()];
+    return `${day} - ${(date.getMonth() + 1).toString().padStart(2, "0")}/${date
+      .getDate()
+      .toString()
+      .padStart(2, "0")}/${date.getFullYear().toString().slice(-2)}`;
+  };
 
-          switch (data.action) {
-            case "created": {
-              // Only add records with baggage numbers that aren't returned
-              if (
-                data.attendance.baggage_number &&
-                !data.attendance.baggage_returned
-              ) {
-                const exists = prevRecords.some(
-                  (record) => record.id === data.attendance.id
-                );
-                if (exists) return prevRecords;
-                newRecords = [data.attendance, ...prevRecords];
-              } else {
-                return prevRecords;
-              }
-              break;
-            }
-            case "updated": {
-              newRecords = prevRecords
-                .map((record) => {
-                  if (record.id === data.attendance.id) {
-                    // If baggage is now returned, filter it out
-                    if (data.attendance.baggage_returned) {
-                      return null;
-                    }
-                    return data.attendance;
-                  }
-                  return record;
-                })
-                .filter((record): record is Attendance => record !== null);
-              break;
-            }
-            case "deleted":
-              newRecords = prevRecords.filter(
-                (record) => record.id !== data.attendance.id
-              );
-              break;
-            default:
-              return prevRecords;
-          }
+  const handleBaggageUpdate = async (record: any) => {
+    if (!record.baggage_number) return;
 
-          // Sort by baggage number
-          return newRecords.sort(
-            (a, b) => (a.baggage_number || 0) - (b.baggage_number || 0)
-          );
-        });
-      };
+    try {
+      setUpdatingBaggage(record.id);
 
-      ws.addMessageHandler(handleMessage);
-      setWebsocketService(ws);
+      const response = await fetch(`${API_URL}/v2/attendance/${record.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...record,
+          baggage_returned: !record.baggage_returned,
+          status: "time_out",
+        }),
+      });
 
-      return () => {
-        ws.removeMessageHandler(handleMessage);
-        ws.disconnect();
-      };
-    };
-
-    const fetchRecords = async () => {
-      try {
-        setIsLoading(true);
-        const response = await fetch(`${API_URL}/v2/attendance`);
-        const data = await response.json();
-
-        if (!Array.isArray(data)) {
-          console.error("Expected array of records but got:", typeof data);
-          setRecords([]);
-          return;
-        }
-
-        // Filter for only active baggage records and sort by baggage number
-        const filteredRecords = data
-          .filter(
-            (record: Attendance) =>
-              record.baggage_number && !record.baggage_returned
-          )
-          .sort(
-            (a: Attendance, b: Attendance) =>
-              (a.baggage_number || 0) - (b.baggage_number || 0)
-          );
-
-        setRecords(filteredRecords);
-      } catch (error) {
-        console.error("Error fetching attendance records:", error);
-        setRecords([]);
-      } finally {
-        setIsLoading(false);
+      if (!response.ok) {
+        throw new Error("Failed to update baggage status");
       }
-    };
 
-    const cleanup = initializeWebSocket();
-    fetchRecords();
-
-    return cleanup;
-  }, [API_URL, WS_URL]);
+      toast({
+        title: "Success",
+        description: "Baggage status updated successfully",
+      });
+    } catch (error) {
+      console.error("Error updating baggage status:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update baggage status",
+        variant: "destructive",
+      });
+    } finally {
+      setUpdatingBaggage(null);
+    }
+  };
 
   useEffect(() => {
     const updateVisibleRecords = (): void => {
       const containerWidth = containerRef.current?.offsetWidth || 0;
       const cardWidth = 180; // Width of each card (160px) + gap (20px)
       const cardsPerView = Math.max(2, Math.floor(containerWidth / cardWidth));
-      setVisibleRecords(records.slice(startIndex, startIndex + cardsPerView));
+      setVisibleRecords(
+        unreturnedRecords.slice(startIndex, startIndex + cardsPerView)
+      );
     };
 
     updateVisibleRecords();
     window.addEventListener("resize", updateVisibleRecords);
     return () => window.removeEventListener("resize", updateVisibleRecords);
-  }, [startIndex, records]);
+  }, [startIndex, unreturnedRecords]);
 
   const loadMoreRecords = (): void => {
     setStartIndex((prevIndex) =>
-      Math.min(prevIndex + 1, records.length - visibleRecords.length)
+      Math.min(prevIndex + 1, unreturnedRecords.length - visibleRecords.length)
     );
   };
 
@@ -179,7 +112,8 @@ export default function BaggageCards() {
   };
 
   const showLeftArrow = startIndex > 0;
-  const showRightArrow = startIndex + visibleRecords.length < records.length;
+  const showRightArrow =
+    startIndex + visibleRecords.length < unreturnedRecords.length;
 
   if (isLoading) {
     return (
@@ -189,35 +123,65 @@ export default function BaggageCards() {
     );
   }
 
+  const StaticBaggageCard = () => (
+    <div className="relative flex-shrink-0 w-[140px] sm:w-[160px] h-[210px] sm:h-[240px] rounded-xl overflow-hidden bg-gray-50 border-2 border-gray-200">
+      <div className="absolute top-4 left-4">
+        <div className="h-10 w-10 sm:h-12 sm:w-12 bg-green-100 rounded-full flex items-center justify-center">
+          <Check className="h-6 w-6 text-green-600" />
+        </div>
+      </div>
+      <div className="absolute inset-0 flex flex-col items-center justify-center p-4">
+        <span className="text-lg font-bold text-gray-700 text-center">
+          All Baggage
+        </span>
+        <span className="text-sm text-gray-500 text-center mt-2">
+          {formatDate()}
+        </span>
+        <span className="text-xs text-green-600 font-medium mt-2">
+          Has Returned
+        </span>
+      </div>
+    </div>
+  );
+
   return (
     <div ref={containerRef} className="w-full relative">
       <ScrollArea className="w-full whitespace-nowrap rounded-md border border-gray-200">
         <div className="flex space-x-5 p-4">
-          {visibleRecords.map((record) => (
-            <div
+          {allBaggageReturned && <StaticBaggageCard />}
+          {unreturnedRecords.map((record) => (
+            <ConfirmationDialog
               key={record.id}
-              className="relative flex-shrink-0 w-[140px] sm:w-[160px] h-[210px] sm:h-[240px] rounded-xl overflow-hidden cursor-pointer transition-transform hover:scale-105 bg-gray-100"
-            >
-              <div className="absolute top-4 left-4">
-                <Avatar className="h-10 w-10 sm:h-12 sm:w-12 border-2 border-white ring-2 ring-gray-200">
-                  <AvatarImage
-                    src={record.current_avatar || "/images/def-avatar.svg"}
-                    alt={record.first_name}
-                  />
-                  <AvatarFallback>{record.first_name[0]}</AvatarFallback>
-                </Avatar>
-              </div>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-5xl sm:text-6xl font-bold text-gray-300">
-                  {record.baggage_number}
-                </span>
-              </div>
-              <div className="absolute bottom-4 left-4 right-4">
-                <p className="text-black text-xs sm:text-sm font-medium truncate">
-                  {record.first_name} {record.middle_name} {record.last_name}
-                </p>
-              </div>
-            </div>
+              trigger={
+                <div className="relative flex-shrink-0 w-[140px] sm:w-[160px] h-[210px] sm:h-[240px] rounded-xl overflow-hidden cursor-pointer transition-transform hover:scale-105 bg-gray-100">
+                  <div className="absolute top-4 left-4">
+                    <Avatar className="h-10 w-10 sm:h-12 sm:w-12 border-2 border-white ring-2 ring-gray-200">
+                      <AvatarImage
+                        src={record.current_avatar || "/images/def-avatar.svg"}
+                        alt={record.first_name}
+                      />
+                      <AvatarFallback>{record.first_name[0]}</AvatarFallback>
+                    </Avatar>
+                  </div>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-5xl sm:text-6xl font-bold text-gray-300">
+                      {record.baggage_number}
+                    </span>
+                  </div>
+                  <div className="absolute bottom-4 left-4 right-4">
+                    <p className="text-black text-xs sm:text-sm font-medium truncate">
+                      {record.first_name} {record.middle_name}{" "}
+                      {record.last_name}
+                    </p>
+                  </div>
+                </div>
+              }
+              title="Mark Baggage as Returned"
+              description={`Are you sure you want to mark baggage #${record.baggage_number} as returned for ${record.first_name} ${record.last_name}?`}
+              confirmText="Mark as Returned"
+              onConfirm={() => handleBaggageUpdate(record)}
+              isLoading={updatingBaggage === record.id}
+            />
           ))}
         </div>
         <ScrollBar orientation="horizontal" />
