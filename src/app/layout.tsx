@@ -24,11 +24,14 @@ const geistMono = localFont({
 
 export const metadata: Metadata = {
   title: "GJC Library: Admin",
-  description: "Manage and track student attendance and activity logs at the General De Jesus College Library.",
-  keywords: "GJC Library, student attendance, student logs, college library management, academic resources",
+  description:
+    "Manage and track student attendance and activity logs at the General De Jesus College Library.",
+  keywords:
+    "GJC Library, student attendance, student logs, college library management, academic resources",
   openGraph: {
     title: "GJC Library: Admin",
-    description: "Monitor and record student attendance and activities at the General De Jesus College Library.",
+    description:
+      "Monitor and record student attendance and activities at the General De Jesus College Library.",
     url: "https://admin.gjclibrary.com",
     siteName: "General De Jesus College Library",
     locale: "en_US",
@@ -37,7 +40,8 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "GJC Library: Admin",
-    description: "Streamline student library usage reporting at the General De Jesus College Library.",
+    description:
+      "Streamline student library usage reporting at the General De Jesus College Library.",
   },
   robots: {
     index: true,
@@ -56,17 +60,17 @@ export default function RootLayout({
         <Script src="https://cdn.tailwindcss.com"></Script>
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased `}
       >
         <Suspense fallback={<></>}>
           <AuthProvider>
             <ConvexClientProvider>
               <Providers>
                 <NextTopLoader color="#E09900" />
-                  <NotificationsProvider>
-                    <Header />
-                    {children}
-                  </NotificationsProvider>
+                <NotificationsProvider>
+                  <Header />
+                  {children}
+                </NotificationsProvider>
               </Providers>
               <Toaster />
             </ConvexClientProvider>

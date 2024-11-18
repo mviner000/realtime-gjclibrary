@@ -1,5 +1,5 @@
 import GJCLeftSideBar from "@/components/gjc/gjcLeftSideBar";
-import SettingsBreadcrumb from "@/components/moderator/SettingsBreadcrumb";
+import { SettingsBreadcrumb } from "@/components/moderator/SettingsBreadcrumb";
 import LeftSideBarLayouWrapper from "@/components/wrappers/leftSideBarLayouWrapper";
 import LeftSideBarLayoutWrapper from "@/components/wrappers/leftSideBarLayouWrapper";
 import type { Metadata } from "next";

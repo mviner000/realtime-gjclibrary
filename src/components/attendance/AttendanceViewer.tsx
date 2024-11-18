@@ -1,18 +1,27 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
+import { ChevronDown, Loader2 } from "lucide-react";
 import { WebSocketService } from "@/utils/websocketService";
 import { env } from "@/env";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/components/ui/use-toast";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/custom-accordion";
 
 interface Attendance {
   id: string;
   school_id: string;
+  current_avatar: string | null;
   first_name: string;
   middle_name?: string;
   last_name: string;
@@ -170,21 +179,54 @@ export default function AttendanceViewer() {
     };
   }, [API_URL, WS_URL]);
 
-  return (
-    <div className="space-y-4 p-4">
-      {isLoading ? (
-        <div className="flex justify-center items-center py-8">
-          <Loader2 className="w-8 h-8 animate-spin" />
-        </div>
-      ) : (
-        <div className="grid gap-4 grid-cols-1">
-          {records.map((record) => (
-            <Card key={`viewer-${record.id}`} className="p-4">
-              <div className="space-y-4">
+  const formatTime = (dateString?: string) => {
+    if (!dateString) return "N/A";
+    const date = new Date(dateString);
+    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  };
+
+  const renderAccordionItem = (record: Attendance) => (
+    <div className="mt-5" key={record.id}>
+      <AccordionItem value={record.id} className="border-none">
+        <Card className="overflow-hidden">
+          <AccordionTrigger className="px-6 py-4 hover:no-underline">
+            <div className="flex justify-between items-center w-full text-left">
+              <div className="flex items-center space-x-4">
+                <Avatar className="h-16 w-16">
+                  <AvatarImage
+                    src={record.current_avatar || "/images/def-avatar.svg"}
+                    alt={record.first_name}
+                  />
+                  <AvatarFallback>
+                    {record.first_name
+                      .split(" ")
+                      .map((n) => n[0])
+                      .join("")
+                      .toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="space-y-1">
+                  <h3 className="font-semibold">{`${record.first_name} ${record.last_name}`}</h3>
+                  <p className="text-sm text-muted-foreground">
+                    {record.course} - {record.year_level}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-4">
+                <div className="text-right">
+                  <p className="text-sm">{record.purpose}</p>
+                  <p className="text-sm text-muted-foreground">
+                    Time In: {formatTime(record.time_in_date)}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </AccordionTrigger>
+          <AccordionContent>
+            <CardContent className="px-6 py-4 space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <h3 className="font-semibold text-lg mb-2">
-                    Student Information
-                  </h3>
+                  <h4 className="font-semibold mb-2">Student Information</h4>
                   <p className="text-sm">
                     <span className="font-medium">ID:</span> {record.school_id}
                   </p>
@@ -202,88 +244,105 @@ export default function AttendanceViewer() {
                   </p>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-lg mb-2">Visit Details</h3>
-                  <div className="space-y-2">
-                    <p className="text-sm">
-                      <span className="font-medium">Purpose:</span>{" "}
-                      {record.purpose}
-                    </p>
-                    {/* <p className="text-sm">
+                  <h4 className="font-semibold mb-2">Visit Details</h4>
+                  <p className="text-sm">
+                    <span className="font-medium">Purpose:</span>{" "}
+                    {record.purpose}
+                  </p>
+                  <p className="text-sm">
+                    <span className="font-medium">Classification:</span>{" "}
+                    <Badge variant="outline">
+                      {record.classification || "N/A"}
+                    </Badge>
+                  </p>
+                  <p className="text-sm">
+                    <span className="font-medium">Time In:</span>{" "}
+                    {record.time_in_date
+                      ? new Date(record.time_in_date).toLocaleString()
+                      : "N/A"}
+                  </p>
+                  <p className="text-sm">
+                    <span className="font-medium">Time Out:</span>{" "}
+                    {record.time_out_date
+                      ? new Date(record.time_out_date).toLocaleString()
+                      : "N/A"}
+                  </p>
+                </div>
+              </div>
+              {record.baggage_number !== undefined && (
+                <div className="bg-secondary p-4 rounded-md">
+                  <h4 className="font-semibold mb-2">Baggage Information</h4>
+                  <p className="text-sm">
+                    <span className="font-medium">Number:</span>{" "}
+                    {record.baggage_number}
+                  </p>
+                  <p className="text-sm">
                     <span className="font-medium">Status:</span>{" "}
                     <Badge
                       variant={
-                        record.status === "time_out" ? "secondary" : "default"
+                        record.baggage_returned ? "default" : "destructive"
                       }
                     >
-                      {record.status}
+                      {record.baggage_returned ? "Returned" : "Not Returned"}
                     </Badge>
-                  </p> */}
-                    <p className="text-sm">
-                      <span className="font-medium">Classification:</span>{" "}
-                      <Badge variant="outline">
-                        {record.classification || "N/A"}
-                      </Badge>
-                    </p>
-                    <p className="text-sm">
-                      <span className="font-medium">Time In:</span>{" "}
-                      {record.time_in_date
-                        ? new Date(record.time_in_date).toLocaleString()
-                        : "N/A"}
-                    </p>
-                    {record.time_out_date && (
-                      <p className="text-sm">
-                        <span className="font-medium">Time Out:</span>{" "}
-                        {new Date(record.time_out_date).toLocaleString()}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </div>
-              {record.baggage_number !== null && (
-                <div className="mt-4 p-3 bg-secondary rounded-md">
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                    <div>
-                      <h3 className="font-semibold text-lg mb-1">
-                        Baggage Information
-                      </h3>
-                      <p className="text-sm">
-                        <span className="font-medium">Number:</span>{" "}
-                        {record.baggage_number}
-                      </p>
-                      <p className="text-sm">
-                        <span className="font-medium">Status:</span>{" "}
-                        <Badge
-                          variant={
-                            record.baggage_returned ? "default" : "destructive"
-                          }
-                        >
-                          {record.baggage_returned
-                            ? "Returned"
-                            : "Not Returned"}
-                        </Badge>
-                      </p>
-                    </div>
+                  </p>
+                  {!record.baggage_returned && (
                     <Button
-                      variant={record.baggage_returned ? "outline" : "default"}
+                      variant="default"
                       size="sm"
+                      className="mt-2"
                       onClick={() => handleBaggageUpdate(record)}
                       disabled={updatingBaggage === record.id}
-                      className="mt-2 sm:mt-0"
                     >
                       {updatingBaggage === record.id ? (
                         <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                      ) : record.baggage_returned ? (
-                        "Mark as Not Returned"
                       ) : (
                         "Mark as Returned"
                       )}
                     </Button>
-                  </div>
+                  )}
                 </div>
               )}
-            </Card>
-          ))}
+            </CardContent>
+          </AccordionContent>
+        </Card>
+      </AccordionItem>
+    </div>
+  );
+
+  return (
+    <div className="container mx-auto p-4 space-y-4">
+      {isLoading ? (
+        <div className="flex justify-center items-center py-8">
+          <Loader2 className="w-8 h-8 animate-spin" />
         </div>
+      ) : (
+        <Tabs defaultValue="not-returned" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="not-returned">Not Returned</TabsTrigger>
+            <TabsTrigger value="returned">Returned</TabsTrigger>
+          </TabsList>
+          <TabsContent value="not-returned">
+            <Accordion type="single" collapsible className="space-y-4">
+              {records
+                .filter(
+                  (record) =>
+                    record.baggage_number !== null && !record.baggage_returned
+                )
+                .map(renderAccordionItem)}
+            </Accordion>
+          </TabsContent>
+          <TabsContent value="returned">
+            <Accordion type="single" collapsible className="space-y-4">
+              {records
+                .filter(
+                  (record) =>
+                    record.baggage_number !== null && record.baggage_returned
+                )
+                .map(renderAccordionItem)}
+            </Accordion>
+          </TabsContent>
+        </Tabs>
       )}
       <Toaster />
     </div>
