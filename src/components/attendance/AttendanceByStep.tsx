@@ -4,8 +4,7 @@ import { useState, useEffect } from "react";
 import { Attendance } from "@/types/attendance";
 import { env } from "@/env";
 
-export default function AttendanceEditor() {
-  const [records, setRecords] = useState<Attendance[]>([]);
+export default function AttendanceByStep() {
   const [schoolId, setSchoolId] = useState("");
   const [purpose, setPurpose] = useState("");
   const [status, setStatus] = useState("");
@@ -47,7 +46,6 @@ export default function AttendanceEditor() {
         const bDate = new Date(b.time_in_date || b.date);
         return bDate.getTime() - aDate.getTime();
       });
-      setRecords(sortedRecords);
     } catch (error) {
       console.error("Error fetching attendance records:", error);
     }
@@ -99,25 +97,6 @@ export default function AttendanceEditor() {
       fetchRecords();
     } catch (error) {
       console.error("Error saving attendance record:", error);
-    }
-  };
-
-  const handleEdit = (record: Attendance) => {
-    setSchoolId(record.school_id);
-    setPurpose(record.purpose);
-    setStatus(record.status);
-    setHasBaggage(record.baggage_number ? true : false);
-    setEditingId(record.id);
-  };
-
-  const handleDelete = async (id: string) => {
-    try {
-      await fetch(`${API_URL}/v2/attendance/${id}`, {
-        method: "DELETE",
-      });
-      fetchRecords();
-    } catch (error) {
-      console.error("Error deleting attendance record:", error);
     }
   };
 
@@ -191,36 +170,6 @@ export default function AttendanceEditor() {
           {editingId ? "Update Record" : "Add Record"}
         </button>
       </form>
-
-      <div className="space-y-4">
-        {records.map((record) => (
-          <div key={record.id} className="border p-4 rounded">
-            <h3 className="font-semibold">School ID: {record.school_id}</h3>
-            <p className="mt-2">
-              Name: {record.first_name} {record.middle_name} {record.last_name}
-            </p>
-            <p>Purpose: {record.purpose}</p>
-            <p>Status: {record.status}</p>
-            {record.baggage_number && (
-              <p>Baggage Number: {record.baggage_number}</p>
-            )}
-            <div className="mt-4 space-x-2">
-              <button
-                onClick={() => handleEdit(record)}
-                className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600"
-              >
-                Edit
-              </button>
-              <button
-                onClick={() => handleDelete(record.id)}
-                className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
     </div>
   );
 }

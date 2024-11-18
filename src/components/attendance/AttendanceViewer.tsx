@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChevronUpSquareIcon, Loader2 } from "lucide-react";
@@ -23,8 +23,21 @@ export default function AttendanceViewer() {
   const { records, isLoading } = useAttendanceData(false);
   const [updatingBaggage, setUpdatingBaggage] = useState<string | null>(null);
   const { toast } = useToast();
+  const [activeTab, setActiveTab] = useState(() => {
+    // Initialize from localStorage or default to "not-returned"
+    return localStorage.getItem("activeAttendanceTab") || "not-returned";
+  });
 
   const API_URL = env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+  // Save active tab to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem("activeAttendanceTab", activeTab);
+  }, [activeTab]);
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+  };
 
   const handleBaggageUpdate = async (record: Attendance) => {
     if (!record.baggage_number) return;
@@ -212,10 +225,15 @@ export default function AttendanceViewer() {
           <Loader2 className="w-8 h-8 animate-spin" />
         </div>
       ) : (
-        <Tabs defaultValue="not-returned" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+        <Tabs
+          value={activeTab}
+          onValueChange={handleTabChange}
+          className="w-full"
+        >
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="not-returned">Not Returned</TabsTrigger>
             <TabsTrigger value="returned">Returned</TabsTrigger>
+            <TabsTrigger value="all">All Baggages</TabsTrigger>
           </TabsList>
           <TabsContent value="not-returned">
             <Accordion type="single" collapsible className="space-y-4">
@@ -234,6 +252,13 @@ export default function AttendanceViewer() {
                   (record) =>
                     record.baggage_number !== null && record.baggage_returned
                 )
+                .map(renderAccordionItem)}
+            </Accordion>
+          </TabsContent>
+          <TabsContent value="all">
+            <Accordion type="single" collapsible className="space-y-4">
+              {records
+                .filter((record) => record.baggage_number !== null)
                 .map(renderAccordionItem)}
             </Accordion>
           </TabsContent>
