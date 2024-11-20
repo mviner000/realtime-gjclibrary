@@ -7,12 +7,15 @@ import { useAttendanceData } from "./utils/useAttendanceData";
 import ConfirmationDialog from "./ConfirmationDialog";
 import { useToast } from "@/components/ui/use-toast";
 import { env } from "@/env";
+import BaggageFilter from "./baggage-filter";
 
 export default function BaggageCardsGrid() {
   const { records: unreturnedRecords, isLoading } = useAttendanceData(true);
   const { records: allRecords } = useAttendanceData(false);
   const [updatingBaggage, setUpdatingBaggage] = useState<string | null>(null);
   const { toast } = useToast();
+
+  const [filter, setFilter] = useState({ type: "name", value: "" });
 
   const API_URL = env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -22,6 +25,10 @@ export default function BaggageCardsGrid() {
     const bTime = new Date(b.time_in_date || 0).getTime();
     return bTime - aTime;
   });
+
+  const handleFilterChange = (type: string, value: string) => {
+    setFilter({ type, value });
+  };
 
   const recordsWithBaggage = allRecords
     .filter((record) => record.baggage_number !== null)
@@ -119,47 +126,83 @@ export default function BaggageCardsGrid() {
     );
   }
 
+  const filteredUnreturnedRecords = sortedUnreturnedRecords.filter((record) => {
+    const searchValue = filter.value.toLowerCase();
+    switch (filter.type) {
+      case "name":
+        const fullName =
+          `${record.first_name} ${record.last_name}`.toLowerCase();
+        return fullName.includes(searchValue);
+      case "schoolId":
+        return record.school_id?.toString().toLowerCase().includes(searchValue);
+      case "baggageNumber":
+        return record.baggage_number
+          ?.toString()
+          .toLowerCase()
+          .includes(searchValue);
+      default:
+        return true;
+    }
+  });
+
   return (
-    <div className="w-full grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 p-4">
-      {allBaggageReturned && <StaticBaggageCard />}
-      {sortedUnreturnedRecords.map((record) => (
-        <ConfirmationDialog
-          key={record.id}
-          trigger={
-            <div className="border-2 border-yellow-400 relative flex-shrink-0 w-full h-[300px] rounded-xl overflow-hidden cursor-pointer transition-transform hover:scale-105 bg-gray-100 mx-auto">
-              <div className="absolute top-4 left-4">
-                <Avatar className="h-10 w-10 sm:h-12 sm:w-12 border-2 border-white ring-2 ring-gray-200">
-                  <AvatarImage
-                    src={record.current_avatar || "/images/def-avatar.svg"}
-                    alt={record.first_name}
-                  />
-                  <AvatarFallback>{record.first_name[0]}</AvatarFallback>
-                </Avatar>
+    <div className="pb-10">
+      <BaggageFilter onFilterChange={handleFilterChange} />
+      <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-4 p-4">
+        {allBaggageReturned && <StaticBaggageCard />}
+        {filteredUnreturnedRecords.map((record) => (
+          <ConfirmationDialog
+            key={record.id}
+            trigger={
+              <div
+                className="border-2 border-yellow-400 relative flex-shrink-0 
+              md:w-full
+              sm:w-3/4
+              xxs:w-3/4
+              h-[300px] 
+              xs:h-[460px] 
+              rounded-xl 
+              overflow-hidden 
+              cursor-pointer 
+              transition-transform 
+              hover:scale-105 
+              bg-gray-100 
+              mx-auto"
+              >
+                <div className="absolute top-4 left-4">
+                  <Avatar className="h-10 w-10 sm:h-12 sm:w-12 border-2 border-white ring-2 ring-gray-200">
+                    <AvatarImage
+                      src={record.current_avatar || "/images/def-avatar.svg"}
+                      alt={record.first_name}
+                    />
+                    <AvatarFallback>{record.first_name[0]}</AvatarFallback>
+                  </Avatar>
+                </div>
+                <div className="absolute top-4 left-20 font-bold dark:text-black">
+                  <p>{record.first_name}</p>
+                  <p>{record.last_name}</p>
+                </div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-green-600 text-9xl font-bold">
+                    {record.baggage_number}
+                  </span>
+                </div>
+                <div className="absolute bottom-4 left-4 right-4">
+                  <p className="dark:text-black text-lg font-bold truncate text-center">
+                    {record.course} {record.year_level}
+                    <p>{record.classification}</p>
+                  </p>
+                </div>
               </div>
-              <div className="absolute top-4 left-20 font-bold dark:text-black">
-                <p>{record.first_name}</p>
-                <p>{record.last_name}</p>
-              </div>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-green-600 text-5xl sm:text-8xl font-bold">
-                  {record.baggage_number}
-                </span>
-              </div>
-              <div className="absolute bottom-4 left-4 right-4">
-                <p className="dark:text-black text-lg font-bold truncate text-center">
-                  {record.course} {record.year_level}
-                  <p>{record.classification}</p>
-                </p>
-              </div>
-            </div>
-          }
-          title="Mark Baggage as Returned"
-          description={`Are you sure you want to mark baggage #${record.baggage_number} as returned for ${record.first_name} ${record.last_name}?`}
-          confirmText="Return"
-          onConfirm={() => handleBaggageUpdate(record)}
-          isLoading={updatingBaggage === record.id}
-        />
-      ))}
+            }
+            title="Mark Baggage as Returned"
+            description={`Are you sure you want to mark baggage #${record.baggage_number} as returned for ${record.first_name} ${record.last_name}?`}
+            confirmText="Return"
+            onConfirm={() => handleBaggageUpdate(record)}
+            isLoading={updatingBaggage === record.id}
+          />
+        ))}
+      </div>
     </div>
   );
 }

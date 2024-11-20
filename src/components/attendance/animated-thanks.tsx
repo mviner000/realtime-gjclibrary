@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Check, CheckCircle, Package } from "lucide-react";
+import { Check, CheckCircle, Package, Spade } from "lucide-react";
 import { Attendance } from "@/types/attendanceform";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -69,10 +69,20 @@ export default function AnimatedThanks({
           </h2>
           <div className="space-y-4 text-center">
             <div className="border-2 border-yellow-400 relative flex-shrink-0 w-[160px] sm:w-[180px] h-[230px] sm:h-[240px] rounded-xl overflow-hidden cursor-pointer transition-transform hover:scale-105 bg-gray-100 mx-auto">
-              <div className="absolute top-4 left-4"></div>
+              <div className="text-center absolute top-3 left-4 dark:text-black">
+                <img src="/images/xmas.svg" alt="bag" className="w-9 h-auto" />
+              </div>
               <div className="absolute inset-0 flex items-center justify-center">
                 <span className="text-green-600 text-5xl sm:text-9xl font-bold">
-                  {attendance.baggage_number}
+                  {attendance.baggage_number ? (
+                    attendance.baggage_number
+                  ) : (
+                    <img
+                      src="/images/santa.svg"
+                      alt="bag"
+                      className="w-28 h-auto"
+                    />
+                  )}
                 </span>
               </div>
               <div className="absolute bottom-4 left-4 right-4">

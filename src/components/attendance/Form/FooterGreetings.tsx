@@ -14,7 +14,7 @@ export default function FooterGreetings({
   const getGreeting = () => {
     switch (currentStep) {
       case 1:
-        return "Please scan your QR Code";
+        return "Please Input your School ID, or scan your QR Code";
       case 2:
         return `Hello ${studentInfo?.first_name || "STUDENT"}! What brings you to the library today?`;
       case 3:
