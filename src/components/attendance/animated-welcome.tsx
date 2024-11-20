@@ -18,17 +18,17 @@ export default function AnimatedWelcome() {
       >
         <div className="text-7xl font-extrabold mb-6 text-center relative z-10">
           <span
-            className="bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-green-500 animate-gradient-x"
+            className=" font-bold bg-clip-text text-slate-300 bg-gradient-to-r from-yellow-400 to-green-500 animate-gradient-x"
             style={{
               textShadow: `
-                -1px -1px 0 #000,  
-                1px -1px 0 #000,
-                -1px 1px 0 #000,
-                1px 1px 0 #000,
-                2px 2px 0 #fff,
-                3px 3px 0 #000,
-                4px 4px 0 rgba(0,0,0,0.2)
-              `,
+            -1px -1px 0 #000,  
+            1px -1px 0 #000,
+            -1px 1px 0 #000,
+            1px 1px 0 #000,
+            2px 2px 0 #000,
+            3px 3px 0 #000,
+            4px 4px 0 rgba(0,0,0,0.2)
+          `,
             }}
           >
             WELCOME!

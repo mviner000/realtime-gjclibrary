@@ -5,11 +5,13 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { useToast } from "@/components/ui/use-toast";
 import BaggageForm from "./BaggageForm";
 import AnimatedWelcome from "./animated-welcome";
 import AnimatedThanks from "./animated-thanks";
+import IdInput from "./IdInput";
 import { env } from "@/env";
+import { StudentInfo } from "@/types/attendanceform";
 
 interface ServiceOption {
   icon: string;
@@ -66,8 +68,10 @@ export default function NewAttendanceForm() {
   const [baggageNumber, setBaggageNumber] = useState<number | null>(null);
   const [submissionData, setSubmissionData] = useState<any>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [studentInfo, setStudentInfo] = useState<StudentInfo | null>(null);
 
   const inputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
 
   const API_URL = env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
   const WS_URL = env.NEXT_PUBLIC_WS_URL || "ws://localhost:8000";
@@ -132,6 +136,33 @@ export default function NewAttendanceForm() {
     })
     .toLowerCase();
 
+  const verifyAccount = async (inputVal: string) => {
+    try {
+      const response = await fetch(`${API_URL}/accounts/${inputVal}/`);
+
+      if (!response.ok) {
+        throw new Error("Account not found");
+      }
+
+      const data: StudentInfo = await response.json();
+      console.log(
+        `Full name: ${data.first_name} ${data.middle_name} ${data.last_name}`
+      );
+      setStudentInfo(data);
+      setCurrentStep(2);
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Account Not Found",
+        description: "Please check the student ID and try again.",
+      });
+      if (inputRef.current) {
+        inputRef.current.focus();
+        inputRef.current.select();
+      }
+    }
+  };
+
   const handleServiceSelect = (value: string) => {
     setSelectedService(value);
     setCurrentStep(3);
@@ -175,19 +206,24 @@ export default function NewAttendanceForm() {
       setCurrentStep(4);
     } catch (error) {
       console.error("Error submitting attendance:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to submit attendance. Please try again.",
+      });
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const resetForm = () => {
-    console.log("Resetting form..."); // Debug log
     setCurrentStep(1);
     setStudentId("");
     setSelectedService("");
     setHasBaggage(null);
     setBaggageNumber(null);
     setSubmissionData(null);
+    setStudentInfo(null);
     if (inputRef.current) {
       inputRef.current.focus();
     }
@@ -196,9 +232,7 @@ export default function NewAttendanceForm() {
   useEffect(() => {
     let timer: NodeJS.Timeout;
     if (currentStep === 4 && submissionData) {
-      console.log("Setting up auto-reset timer..."); // Debug log
       timer = setTimeout(() => {
-        console.log("Auto-reset triggered"); // Debug log
         resetForm();
       }, 5000);
     }
@@ -225,40 +259,18 @@ export default function NewAttendanceForm() {
   };
 
   return (
-    <Card className="w-full mx-16 bg-transparent outline-none border-none">
+    <Card className="w-full z-[1] bg-transparent outline-none border-none">
       <CardContent className="p-6 flex">
         {/* Left side */}
         <div className="w-1/4 pr-6">
           <AnimatedWelcome />
-          <div className="space-y-6 text-center">
-            <div className="mx-auto w-full max-w-[360px] aspect-square relative rounded-lg overflow-hidden group">
-              <Image
-                src="/images/gjchomepagelink.png"
-                alt="QR Code"
-                layout="fill"
-                objectFit="cover"
-                className="transition-transform duration-300 group-hover:scale-110"
-              />
-              <div className="absolute inset-0 bg-gradient-to-r from-green-400/30 to-yellow-400/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            </div>
-            <Input
-              id="studentId"
-              type="text"
-              placeholder="Student ID"
-              value={studentId}
-              onChange={(e) => setStudentId(e.target.value)}
-              className="w-full max-w-2xl text-center text-2xl bg-white/90 text-green-800 placeholder:text-green-600/70 
-                   border-4 border-green-600 
-                   transition-all duration-300 rounded-xl py-6 px-4 shadow-lg"
-              ref={inputRef}
-              onKeyPress={(e) => {
-                if (e.key === "Enter" && studentId.trim() !== "") {
-                  setCurrentStep(2);
-                }
-              }}
-              disabled={currentStep !== 1}
-            />
-          </div>
+          <IdInput
+            studentId={studentId}
+            onChange={setStudentId}
+            onEnter={() => verifyAccount(studentId)}
+            disabled={currentStep !== 1}
+            ref={inputRef}
+          />
         </div>
 
         {/* Right side */}
@@ -339,7 +351,7 @@ export default function NewAttendanceForm() {
           <div className="text-3xl font-bold">
             {currentStep === 1 && "Please scan your QR Code"}
             {currentStep === 2 &&
-              `Hello ${submissionData?.first_name || "STUDENT"}! What brings you to the library today?`}
+              `Hello ${studentInfo?.first_name || "STUDENT"}! What brings you to the library today?`}
             {currentStep === 3 && "Do you have any baggage with you today?"}
             {currentStep === 4 && "Thank you for using our service!"}
           </div>
