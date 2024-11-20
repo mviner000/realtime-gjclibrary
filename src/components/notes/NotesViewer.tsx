@@ -9,7 +9,7 @@ export default function NotesViewer() {
   const reconnectTimeoutRef = useRef<NodeJS.Timeout>();
   const isComponentMounted = useRef(true);
 
-  const API_URL = env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+  const API_URL = env.NEXT_PUBLIC_API_URL;
   const WS_URL = env.NEXT_PUBLIC_WS_URL || "ws://localhost:8000";
 
   useEffect(() => {
