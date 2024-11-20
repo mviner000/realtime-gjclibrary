@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { Note, WebSocketMessage } from "@/types/note";
-import { env } from "process";
+import { env } from "@/env";
 
 export default function NotesViewer() {
   const [notes, setNotes] = useState<Note[]>([]);
