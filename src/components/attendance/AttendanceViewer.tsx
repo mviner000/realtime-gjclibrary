@@ -16,23 +16,28 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/custom-accordion";
-import { useAttendanceData, type Attendance } from "./useAttendanceData";
+import { useAttendanceData, type Attendance } from "./utils/useAttendanceData";
 import ConfirmationDialog from "./ConfirmationDialog";
 
 export default function AttendanceViewer() {
   const { records, isLoading } = useAttendanceData(false);
   const [updatingBaggage, setUpdatingBaggage] = useState<string | null>(null);
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState(() => {
-    // Initialize from localStorage or default to "not-returned"
-    return localStorage.getItem("activeAttendanceTab") || "not-returned";
+  const [activeTab, setActiveTab] = useState<string>(() => {
+    // Safely check for localStorage only on client-side
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("activeAttendanceTab") || "not-returned";
+    }
+    return "not-returned";
   });
 
   const API_URL = env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
   // Save active tab to localStorage whenever it changes
   useEffect(() => {
-    localStorage.setItem("activeAttendanceTab", activeTab);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("activeAttendanceTab", activeTab);
+    }
   }, [activeTab]);
 
   const handleTabChange = (value: string) => {
@@ -197,7 +202,7 @@ export default function AttendanceViewer() {
                       }
                       title="Confirm Baggage Return"
                       description="Are you sure you want to mark this baggage as returned? This action cannot be undone."
-                      confirmText="Mark as Returned"
+                      confirmText="Return"
                       onConfirm={() => handleBaggageUpdate(record)}
                       isLoading={updatingBaggage === record.id}
                     />

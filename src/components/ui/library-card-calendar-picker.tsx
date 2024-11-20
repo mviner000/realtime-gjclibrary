@@ -12,7 +12,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useCallback } from "react";
 
 export type CalendarProps = Omit<DayPickerSingleProps, "mode"> & {
   isOpen: boolean;
@@ -44,23 +44,29 @@ function CardCalendar({
     console.log("[CardCalendar] Calendar state:", isOpen ? "open" : "closed");
   }, [isOpen]);
 
-  // Keep ESC handler to close the calendar
-  const handleKeyDown = (event: KeyboardEvent) => {
-    // Only close if this is the active cell
-    if (event.key === "Escape" && isOpen && activeCellIndex === currentCellIndex) {
-      console.log("[CardCalendar] ESC pressed, closing calendar");
-      event.preventDefault();
-      event.stopPropagation();
-      onClose();
-    }
-  };
+  // Memoize the keyboard event handler
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent) => {
+      if (
+        event.key === "Escape" &&
+        isOpen &&
+        activeCellIndex === currentCellIndex
+      ) {
+        console.log("[CardCalendar] ESC pressed, closing calendar");
+        event.preventDefault();
+        event.stopPropagation();
+        onClose();
+      }
+    },
+    [isOpen, onClose, activeCellIndex, currentCellIndex]
+  );
 
   useEffect(() => {
     if (isOpen && activeCellIndex === currentCellIndex) {
       window.addEventListener("keydown", handleKeyDown, true);
+      return () => window.removeEventListener("keydown", handleKeyDown, true);
     }
-    return () => window.removeEventListener("keydown", handleKeyDown, true);
-  }, [isOpen, onClose, activeCellIndex, currentCellIndex]);
+  }, [isOpen, activeCellIndex, currentCellIndex, handleKeyDown]);
 
   const handleYearChange = (newYear: number) => {
     console.log("[CardCalendar] Year changed to:", newYear);

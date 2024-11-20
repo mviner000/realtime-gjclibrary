@@ -53,6 +53,7 @@ export type Attendance = {
   time_out_date: string | null;
   has_already_timed_in: boolean;
   has_already_timed_out: boolean;
+  baggage_number: number;
   random_quote: {
     text: string;
     author: string;

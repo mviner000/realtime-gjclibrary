@@ -1,115 +1,123 @@
 "use client";
 
-import { useState, useEffect, useCallback } from 'react'
-import { useQuery, useMutation } from 'convex/react'
-import debounce from 'lodash/debounce'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { X, Search, ChevronLeft, ChevronRight } from 'lucide-react'
-import { AccountType } from '../types'
-import { api } from '../../convex/_generated/api'
-import useClickOutside from '@/hooks/useClickOutside';
-import Link from 'next/link';
+import { useState, useEffect, useCallback } from "react";
+import { useQuery, useMutation } from "convex/react";
+import debounce from "lodash/debounce";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { X, Search, ChevronLeft, ChevronRight } from "lucide-react";
+import { AccountType } from "../types";
+import { api } from "../../convex/_generated/api";
+import useClickOutside from "@/hooks/useClickOutside";
+import Link from "next/link";
 
 const DEBOUNCE_MS = 300;
 
 interface SearchResultsType {
-  accounts: AccountType[]
-  totalPages: number
-  currentPage: number
-  hasNextPage: boolean
-  hasPrevPage: boolean
+  accounts: AccountType[];
+  totalPages: number;
+  currentPage: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
   searchMeta: {
-    searchTerm: string
-    normalizedSearchTerm: string
-    resultsCount: number
-    isExactMatch: boolean
-    searchType: "school_id" | "name" | "combined"
-  }
+    searchTerm: string;
+    normalizedSearchTerm: string;
+    resultsCount: number;
+    isExactMatch: boolean;
+    searchType: "school_id" | "name" | "combined";
+  };
 }
 
 export default function Component() {
-  const [searchTerm, setSearchTerm] = useState('')
-  const [page, setPage] = useState(1)
-  const [showSuggestions, setShowSuggestions] = useState(false)
+  const [searchTerm, setSearchTerm] = useState("");
+  const [page, setPage] = useState(1);
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
-  const logSearch = useMutation(api.queries.accounts.logSearch)
+  const logSearch = useMutation(api.queries.accounts.logSearch);
 
   const searchResults = useQuery(api.queries.accounts.searchAccounts, {
     searchTerm,
-    page
-  }) as SearchResultsType | undefined
+    page,
+  }) as SearchResultsType | undefined;
 
   const suggestions = useQuery(api.queries.accounts.getSearchSuggestions, {
-    searchTerm
-  }) as AccountType[] | undefined
+    searchTerm,
+  }) as AccountType[] | undefined;
 
-  const debouncedSearch = useCallback(
-    debounce((term: string) => {
-      setShowSuggestions(term.length >= 2)
-    }, DEBOUNCE_MS),
-    []
-  )
+  // Move the debounced function creation outside of useCallback
+  const setShowSuggestionsDebounced = debounce((term: string) => {
+    setShowSuggestions(term.length >= 2);
+  }, DEBOUNCE_MS);
+
+  // Wrap the debounced function call in useCallback
+  const debouncedSearch = useCallback((term: string) => {
+    setShowSuggestionsDebounced(term);
+  }, []); // Empty dependencies array since setShowSuggestionsDebounced is stable
 
   useEffect(() => {
-    debouncedSearch(searchTerm)
-    return () => debouncedSearch.cancel()
-  }, [searchTerm, debouncedSearch])
+    debouncedSearch(searchTerm);
+    return () => {
+      setShowSuggestionsDebounced.cancel();
+    };
+  }, [searchTerm, debouncedSearch, setShowSuggestionsDebounced]);
 
   const handleSearch = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setShowSuggestions(false)
-    setPage(1)
+    e.preventDefault();
+    setShowSuggestions(false);
+    setPage(1);
 
     if (searchResults?.searchMeta) {
-      const { searchMeta } = searchResults
+      const { searchMeta } = searchResults;
       await logSearch({
         searchTerm: searchMeta.searchTerm,
         normalizedSearchTerm: searchMeta.normalizedSearchTerm,
         resultsCount: searchMeta.resultsCount,
         page: page,
         isExactMatch: searchMeta.isExactMatch,
-        searchType: searchMeta.searchType
-      })
+        searchType: searchMeta.searchType,
+      });
     }
-  }
+  };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleSearch(e)
+    if (e.key === "Enter") {
+      handleSearch(e);
     }
-  }
+  };
 
   const clearSearch = () => {
-    setSearchTerm('')
-    setShowSuggestions(false)
-    setPage(1)
-  }
+    setSearchTerm("");
+    setShowSuggestions(false);
+    setPage(1);
+  };
 
   const handlePageChange = async (newPage: number) => {
-    setPage(newPage)
-    
+    setPage(newPage);
+
     if (searchResults?.searchMeta) {
-      const { searchMeta } = searchResults
+      const { searchMeta } = searchResults;
       await logSearch({
         searchTerm: searchMeta.searchTerm,
         normalizedSearchTerm: searchMeta.normalizedSearchTerm,
         resultsCount: searchMeta.resultsCount,
         page: newPage,
         isExactMatch: searchMeta.isExactMatch,
-        searchType: searchMeta.searchType
-      })
+        searchType: searchMeta.searchType,
+      });
     }
-  }
+  };
 
   const searchRef = useClickOutside(() => {
-    setShowSuggestions(false)
-  })
+    setShowSuggestions(false);
+  });
 
   return (
     <div className="w-full max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
       <div ref={searchRef} className="relative">
-        <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-2">
+        <form
+          onSubmit={handleSearch}
+          className="flex flex-col sm:flex-row gap-2"
+        >
           <div className="relative flex-1">
             <Input
               type="text"
@@ -136,13 +144,13 @@ export default function Component() {
         </form>
 
         {showSuggestions && suggestions && suggestions.length > 0 && (
-          <div className="absolute w-full bg-white  mt-1 rounded-md shadow-lg border border-gray-200 z-10 max-h-60 overflow-y-auto">
+          <div className="absolute w-full bg-white mt-1 rounded-md shadow-lg border border-gray-200 z-10 max-h-60 overflow-y-auto">
             {suggestions.map((account) => (
               <button
                 key={account._id}
                 onClick={() => {
-                  setSearchTerm(account.school_id.toString())
-                  setShowSuggestions(false)
+                  setSearchTerm(account.school_id.toString());
+                  setShowSuggestions(false);
                 }}
                 className="w-full px-4 py-2 text-left dark:text-black hover:bg-gray-100 cursor-pointer"
               >
@@ -171,7 +179,8 @@ export default function Component() {
                     <Link href={`/students/${account.school_id}`}>
                       <div className="p-4 border rounded-lg hover:bg-gray-50 hover:text-gray-600 hover:cursor-pointer">
                         <h3 className="font-medium">
-                          {account.first_name} {account.middle_name} {account.last_name}
+                          {account.first_name} {account.middle_name}{" "}
+                          {account.last_name}
                         </h3>
                         <p className="text-sm text-gray-600">
                           School ID: {account.school_id}
@@ -179,7 +188,9 @@ export default function Component() {
                         {account.role && (
                           <p className="text-sm text-gray-600">
                             {account.role}
-                            {account.department && ` - ${account.department}`} • {account.course} • {account.year_level}
+                            {account.department &&
+                              ` - ${account.department}`} • {account.course} •{" "}
+                            {account.year_level}
                           </p>
                         )}
                       </div>
@@ -199,7 +210,8 @@ export default function Component() {
                     Previous
                   </Button>
                   <span className="text-sm text-gray-600">
-                    Page {searchResults.currentPage} of {searchResults.totalPages}
+                    Page {searchResults.currentPage} of{" "}
+                    {searchResults.totalPages}
                   </span>
                   <Button
                     onClick={() => handlePageChange(page + 1)}
@@ -214,11 +226,12 @@ export default function Component() {
             </>
           ) : (
             <div className="text-center py-8 text-gray-600">
-              No accounts found matching &quot;{searchResults.searchMeta.searchTerm}&quot;
+              No accounts found matching &quot;
+              {searchResults.searchMeta.searchTerm}&quot;
             </div>
           )}
         </div>
       )}
     </div>
-  )
+  );
 }

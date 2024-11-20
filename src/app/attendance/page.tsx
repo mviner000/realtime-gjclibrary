@@ -1,4 +1,4 @@
-import NewAttendanceForm from "@/components/attendance/NewAttendanceForm";
+import NewAttendanceForm from "@/components/attendance/Form/NewAttendanceForm";
 
 export default async function AttendancePage() {
   return (

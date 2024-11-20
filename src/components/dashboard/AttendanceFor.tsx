@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon, RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -39,38 +39,43 @@ export default function AttendanceFor() {
   const [date, setDate] = useState<Date>(new Date());
   const [attendance, setAttendance] = useState<AttendanceRecord[]>([]);
   const [loading, setLoading] = useState(false);
-  const [processingTimeOut, setProcessingTimeOut] = useState<string | null>(null);
+  const [processingTimeOut, setProcessingTimeOut] = useState<string | null>(
+    null
+  );
   const { toast } = useToast();
 
-  const fetchAttendance = async (selectedDate: Date) => {
-    setLoading(true);
-    try {
-      const formattedDate = format(selectedDate, "yyyy-MM-dd");
-      const response = await fetch(`/api/attendance-for/${formattedDate}`);
-      const data = await response.json();
-      
-      if (response.ok) {
-        const activeRecords = Array.isArray(data) 
-          ? data.filter(record => !record.time_out_date)
-          : [];
-        setAttendance(activeRecords);
-      } else {
+  const fetchAttendance = useCallback(
+    async (selectedDate: Date) => {
+      setLoading(true);
+      try {
+        const formattedDate = format(selectedDate, "yyyy-MM-dd");
+        const response = await fetch(`/api/attendance-for/${formattedDate}`);
+        const data = await response.json();
+
+        if (response.ok) {
+          const activeRecords = Array.isArray(data)
+            ? data.filter((record) => !record.time_out_date)
+            : [];
+          setAttendance(activeRecords);
+        } else {
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: "Failed to fetch attendance records",
+          });
+        }
+      } catch (error) {
         toast({
           variant: "destructive",
           title: "Error",
-          description: "Failed to fetch attendance records"
+          description: "Error loading attendance records",
         });
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Error loading attendance records"
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+    },
+    [toast]
+  );
 
   const handleTimeOut = async (attendanceId: string) => {
     setProcessingTimeOut(attendanceId);
@@ -80,10 +85,10 @@ export default function AttendanceFor() {
     };
 
     try {
-      const response = await fetch('/api/attendance/time-out', {
-        method: 'POST',
+      const response = await fetch("/api/attendance/time-out", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(requestBody),
       });
@@ -93,21 +98,23 @@ export default function AttendanceFor() {
       if (response.ok) {
         toast({
           title: "Success",
-          description: "Successfully returned"
+          description: "Successfully returned",
         });
-        setAttendance(prev => prev.filter(record => record.id !== attendanceId));
+        setAttendance((prev) =>
+          prev.filter((record) => record.id !== attendanceId)
+        );
       } else {
         toast({
           variant: "destructive",
           title: "Error",
-          description: data.error || "Failed to process time-out"
+          description: data.error || "Failed to process time-out",
         });
       }
     } catch (error) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Error processing time-out"
+        description: "Error processing time-out",
       });
     } finally {
       setProcessingTimeOut(null);
@@ -120,7 +127,7 @@ export default function AttendanceFor() {
 
   useEffect(() => {
     fetchAttendance(date);
-  }, [date]);
+  }, [date, fetchAttendance]);
 
   return (
     <div className="container mx-auto py-8">
@@ -129,15 +136,15 @@ export default function AttendanceFor() {
           <div className="flex items-center justify-between">
             <CardTitle>Active Attendance Records</CardTitle>
             <div className="flex gap-2">
-                <Button
+              <Button
                 onClick={handleRefresh}
                 disabled={loading}
                 variant="outline"
                 size="sm"
-                >
-                    <RefreshCw className="mr-2 h-4 w-4" />
-                    Refresh
-                </Button>
+              >
+                <RefreshCw className="mr-2 h-4 w-4" />
+                Refresh
+              </Button>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
@@ -174,7 +181,7 @@ export default function AttendanceFor() {
                     <TableHead>ID</TableHead>
                     <TableHead>Name</TableHead>
                     <TableHead>Time In</TableHead>
-                    <TableHead>Bag Nummber</TableHead>
+                    <TableHead>Bag Number</TableHead>
                     <TableHead>Baggage</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -194,11 +201,14 @@ export default function AttendanceFor() {
                         <TableCell>
                           <div className="flex items-center gap-2">
                             <img
-                              src={record.current_avatar || 'images/def-avatar.svg'}
+                              src={
+                                record.current_avatar || "images/def-avatar.svg"
+                              }
                               alt={record.full_name}
                               className="h-8 w-8 rounded-full"
                               onError={(e) => {
-                                (e.target as HTMLImageElement).src = 'images/def-avatar.svg';
+                                (e.target as HTMLImageElement).src =
+                                  "images/def-avatar.svg";
                               }}
                             />
                             {record.full_name}
@@ -213,10 +223,17 @@ export default function AttendanceFor() {
                               No Baggage
                             </span>
                           ) : (
-                            <span className={`px-2 py-1 rounded-full text-xs ${
-                              record.baggage_returned ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                            }`}>
-                              #{record.baggage_number} - {record.baggage_returned ? 'Returned' : 'Not Returned'}
+                            <span
+                              className={`px-2 py-1 rounded-full text-xs ${
+                                record.baggage_returned
+                                  ? "bg-green-100 text-green-800"
+                                  : "bg-yellow-100 text-yellow-800"
+                              }`}
+                            >
+                              #{record.baggage_number} -{" "}
+                              {record.baggage_returned
+                                ? "Returned"
+                                : "Not Returned"}
                             </span>
                           )}
                         </TableCell>
@@ -225,10 +242,19 @@ export default function AttendanceFor() {
                             variant="outline"
                             size="sm"
                             onClick={() => handleTimeOut(record.id)}
-                            disabled={processingTimeOut === record.id || record.baggage_number === null}
-                            className={record.baggage_number === null ? "cursor-not-allowed opacity-50" : ""}
+                            disabled={
+                              processingTimeOut === record.id ||
+                              record.baggage_number === null
+                            }
+                            className={
+                              record.baggage_number === null
+                                ? "cursor-not-allowed opacity-50"
+                                : ""
+                            }
                           >
-                            {processingTimeOut === record.id ? "Processing..." : "Return"}
+                            {processingTimeOut === record.id
+                              ? "Processing..."
+                              : "Return"}
                           </Button>
                         </TableCell>
                       </TableRow>

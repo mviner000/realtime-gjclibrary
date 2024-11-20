@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { debounce } from "lodash";
 import { BookSuggestion } from "@/types";
 import { fetchBookSuggestions } from "../utils/api";
@@ -9,37 +9,50 @@ const useBookSuggestions = () => {
   const [activeCell, setActiveCell] = useState<number | null>(null);
   const [selectedBookTitle, setSelectedBookTitle] = useState<string>("");
 
+  // Separate the fetch logic from debounce
+  const fetchSuggestions = useCallback(async (query: string) => {
+    if (query.length < 2) {
+      setSuggestions([]);
+      setIsPopoverOpen(false);
+      return;
+    }
+
+    try {
+      const data = await fetchBookSuggestions(query);
+      setSuggestions(data);
+      setIsPopoverOpen(data.length > 0);
+    } catch (error) {
+      console.error("Error fetching suggestions:", error);
+      setSuggestions([]);
+      setIsPopoverOpen(false);
+    }
+  }, []);
+
+  // Create a debounced version of the fetch function
   const debouncedFetchSuggestions = useCallback(
-    debounce(async (query: string) => {
-      if (query.length < 2) {
-        setSuggestions([]);
-        setIsPopoverOpen(false);
-        return;
-      }
-      try {
-        const data = await fetchBookSuggestions(query);
-        setSuggestions(data);
-        setIsPopoverOpen(data.length > 0);
-      } catch (error) {
-        console.error("Error fetching suggestions:", error);
-      }
-    }, 300),
-    []
+    debounce(fetchSuggestions, 300),
+    [fetchSuggestions]
   );
 
-  const handleSuggestionClick = (suggestion: BookSuggestion) => {
-    setSelectedBookTitle(suggestion.title);
-    // Implementation depends on how you want to handle this
-    console.log("Suggestion clicked:", suggestion);
-    // You might want to update the grid data or transaction data here
-    closePopover();
-  };
+  // Cleanup the debounced function on unmount
+  useEffect(() => {
+    return () => {
+      debouncedFetchSuggestions.cancel();
+    };
+  }, [debouncedFetchSuggestions]);
 
-  const closePopover = () => {
+  const handleSuggestionClick = useCallback((suggestion: BookSuggestion) => {
+    setSelectedBookTitle(suggestion.title);
     setSuggestions([]);
     setActiveCell(null);
     setIsPopoverOpen(false);
-  };
+  }, []);
+
+  const closePopover = useCallback(() => {
+    setSuggestions([]);
+    setActiveCell(null);
+    setIsPopoverOpen(false);
+  }, []);
 
   return {
     suggestions,

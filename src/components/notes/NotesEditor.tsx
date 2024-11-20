@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Note } from "@/types/note";
 import { env } from "@/env";
 
@@ -12,11 +12,7 @@ export default function NotesEditor() {
 
   const API_URL = env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
-  useEffect(() => {
-    fetchNotes();
-  }, []);
-
-  const fetchNotes = async () => {
+  const fetchNotes = useCallback(async () => {
     try {
       const response = await fetch(`${API_URL}/v1/notes`);
       const data = (await response.json()) as Note[];
@@ -28,7 +24,11 @@ export default function NotesEditor() {
     } catch (error) {
       console.error("Error fetching notes:", error);
     }
-  };
+  }, [API_URL]);
+
+  useEffect(() => {
+    fetchNotes();
+  }, [fetchNotes]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -39,6 +39,11 @@ const IdInput = forwardRef<HTMLInputElement, IdInputProps>(
             }
           }}
           disabled={disabled}
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="off"
+          spellCheck="false"
+          data-form-type="other"
         />
       </div>
     );

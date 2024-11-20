@@ -2,8 +2,9 @@ import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { CheckCircle, Package } from "lucide-react";
+import { Check, CheckCircle, Package } from "lucide-react";
 import { Attendance } from "@/types/attendanceform";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface ComponentProps {
   studentId: string;
@@ -67,19 +68,20 @@ export default function AnimatedThanks({
             Thanks for visiting us!
           </h2>
           <div className="space-y-4 text-center">
-            <p className="text-2xl text-green-700">
-              Student ID: <span className="font-semibold">{studentId}</span>
-            </p>
-            <p className="text-2xl text-green-700">
-              Name:{" "}
-              <span className="font-semibold">{`${attendance.first_name} ${attendance.middle_name} ${attendance.last_name}`}</span>
-            </p>
-            <p className="text-2xl text-green-700">
-              Purpose:{" "}
-              <span className="font-semibold">
-                {selectedService.replace(/_/g, " ").toUpperCase()}
-              </span>
-            </p>
+            <div className="border-2 border-yellow-400 relative flex-shrink-0 w-[160px] sm:w-[180px] h-[230px] sm:h-[240px] rounded-xl overflow-hidden cursor-pointer transition-transform hover:scale-105 bg-gray-100 mx-auto">
+              <div className="absolute top-4 left-4"></div>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-green-600 text-5xl sm:text-9xl font-bold">
+                  {attendance.baggage_number}
+                </span>
+              </div>
+              <div className="absolute bottom-4 left-4 right-4">
+                <p className="text-black text-lg font-bold truncate text-center">
+                  {attendance.first_name} {attendance.middle_name}{" "}
+                  {attendance.last_name}
+                </p>
+              </div>
+            </div>
             {hasBaggage && baggageNumber && (
               <motion.div
                 initial={{ opacity: 0, y: 10 }}

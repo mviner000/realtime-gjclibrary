@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Note, WebSocketMessage } from "@/types/note";
 import { env } from "@/env";
 
@@ -12,24 +12,7 @@ export default function NotesViewer() {
   const API_URL = env.NEXT_PUBLIC_API_URL;
   const WS_URL = env.NEXT_PUBLIC_WS_URL || "ws://localhost:8000";
 
-  useEffect(() => {
-    isComponentMounted.current = true;
-    fetchNotes();
-    setupWebSocket();
-
-    return () => {
-      isComponentMounted.current = false;
-      if (reconnectTimeoutRef.current) {
-        clearTimeout(reconnectTimeoutRef.current);
-      }
-      if (wsRef.current) {
-        wsRef.current.close();
-        wsRef.current = null;
-      }
-    };
-  }, []);
-
-  const fetchNotes = async () => {
+  const fetchNotes = useCallback(async () => {
     try {
       const response = await fetch(`${API_URL}/v1/notes`);
       const data = (await response.json()) as Note[];
@@ -42,9 +25,9 @@ export default function NotesViewer() {
     } catch (error) {
       console.error("Error fetching notes:", error);
     }
-  };
+  }, [API_URL]);
 
-  const setupWebSocket = () => {
+  const setupWebSocket = useCallback(() => {
     if (!isComponentMounted.current) return;
 
     if (wsRef.current?.readyState === WebSocket.OPEN) {
@@ -105,7 +88,24 @@ export default function NotesViewer() {
         }, 3000);
       }
     };
-  };
+  }, [WS_URL]);
+
+  useEffect(() => {
+    isComponentMounted.current = true;
+    fetchNotes();
+    setupWebSocket();
+
+    return () => {
+      isComponentMounted.current = false;
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+      }
+      if (wsRef.current) {
+        wsRef.current.close();
+        wsRef.current = null;
+      }
+    };
+  }, [fetchNotes, setupWebSocket]);
 
   return (
     <div className="space-y-4">

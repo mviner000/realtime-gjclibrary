@@ -5,7 +5,7 @@ import { ChevronRight, ChevronLeft, Loader2, Check } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { useAttendanceData } from "./useAttendanceData";
+import { useAttendanceData } from "./utils/useAttendanceData";
 import ConfirmationDialog from "./ConfirmationDialog";
 import { useToast } from "@/components/ui/use-toast";
 import { env } from "@/env";
@@ -34,6 +34,12 @@ export default function BaggageCards() {
   const allBaggageReturned =
     recordsWithBaggage.length > 0 && unreturnedRecords.length === 0;
 
+  // Console log to check baggage return status
+  console.log("Records with Baggage:", recordsWithBaggage.length);
+  console.log("Unreturned Records:", unreturnedRecords.length);
+  console.log("All Baggage Returned:", allBaggageReturned);
+
+  // Rest of the code remains the same...
   const formatDate = () => {
     const date = new Date();
     const days = [
@@ -165,7 +171,7 @@ export default function BaggageCards() {
             <ConfirmationDialog
               key={record.id}
               trigger={
-                <div className="relative flex-shrink-0 w-[140px] sm:w-[160px] h-[210px] sm:h-[240px] rounded-xl overflow-hidden cursor-pointer transition-transform hover:scale-105 bg-gray-100">
+                <div className="border-2 border-yellow-400 relative flex-shrink-0 w-[160px] sm:w-[180px] h-[230px] sm:h-[240px] rounded-xl overflow-hidden cursor-pointer transition-transform hover:scale-105 bg-gray-100 mx-auto">
                   <div className="absolute top-4 left-4">
                     <Avatar className="h-10 w-10 sm:h-12 sm:w-12 border-2 border-white ring-2 ring-gray-200">
                       <AvatarImage
@@ -176,12 +182,12 @@ export default function BaggageCards() {
                     </Avatar>
                   </div>
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-5xl sm:text-6xl font-bold text-gray-300">
+                    <span className="text-green-600 text-5xl sm:text-8xl font-bold">
                       {record.baggage_number}
                     </span>
                   </div>
                   <div className="absolute bottom-4 left-4 right-4">
-                    <p className="text-black text-xs sm:text-sm font-medium truncate">
+                    <p className="text-black text-lg font-bold truncate text-center">
                       {record.first_name} {record.middle_name}{" "}
                       {record.last_name}
                     </p>
@@ -190,7 +196,7 @@ export default function BaggageCards() {
               }
               title="Mark Baggage as Returned"
               description={`Are you sure you want to mark baggage #${record.baggage_number} as returned for ${record.first_name} ${record.last_name}?`}
-              confirmText="Mark as Returned"
+              confirmText="Return"
               onConfirm={() => handleBaggageUpdate(record)}
               isLoading={updatingBaggage === record.id}
             />

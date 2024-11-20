@@ -19,7 +19,7 @@ export function HeaderActions({ user }: Props) {
     if (isUnlocked) {
       setIsLocked(false);
     }
-  }, []);
+  }, [setIsLocked]); // Added setIsLocked to dependency array
 
   return (
     <div className="flex items-center gap-4">

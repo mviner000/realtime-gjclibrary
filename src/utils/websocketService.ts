@@ -6,6 +6,10 @@ export class WebSocketService {
   private reconnectTimeout = 1000; // Start with 1 second
   private messageHandlers: ((data: any) => void)[] = [];
 
+  private notifyHandlers(data: any) {
+    this.messageHandlers.forEach((handler) => handler(data));
+  }
+
   constructor(private url: string) {
     this.connect();
   }
@@ -17,25 +21,31 @@ export class WebSocketService {
       this.ws.onopen = () => {
         console.log("WebSocket connection established");
         this.reconnectAttempts = 0;
-        this.reconnectTimeout = 1000; // Reset timeout on successful connection
+        this.reconnectTimeout = 1000;
+        this.notifyHandlers({ type: "connection_status", status: "connected" });
       };
 
       this.ws.onmessage = (event) => {
         const data = JSON.parse(event.data);
-        this.messageHandlers.forEach((handler) => handler(data));
+        this.notifyHandlers(data);
       };
 
       this.ws.onclose = (event) => {
         console.log("WebSocket connection closed", event);
+        this.notifyHandlers({
+          type: "connection_status",
+          status: "disconnected",
+        });
         this.handleReconnect();
       };
 
       this.ws.onerror = (error) => {
         console.warn("WebSocket error:", error);
-        // Don't close the connection here - let onclose handle it
+        this.notifyHandlers({ type: "connection_status", status: "error" });
       };
     } catch (error) {
       console.error("WebSocket connection error:", error);
+      this.notifyHandlers({ type: "connection_status", status: "error" });
       this.handleReconnect();
     }
   }
