@@ -1,12 +1,14 @@
 import React from "react";
+import { usePathname } from "next/navigation";
+import { useAuth } from "@/providers/authProviders";
+import { useFetchUser } from "@/utils/useFetchUser";
 import { cn } from "@/lib/utils";
 import DueDateGrid from "@/components/card/DueDateGrid";
 import Grid from "@/components/card/Grid";
-import { CheckIcon, XIcon } from "lucide-react";
-import ApprovalStatus from "./ApprovalStatus";
 import { Account } from "@/types";
 import { BookTransactionByAccountId } from "./BookTransactionByAccountId";
 import AutoReloadWrapper from "@/components/card/EditorMode/AutoReloadWrapper";
+import ClearanceCheckboxes from "@/components/clearance/ClearanceCheckboxes";
 
 interface StudentCardProps {
   account: Account;
@@ -27,12 +29,24 @@ const StudentCard: React.FC<StudentCardProps> = ({
   fontClass,
   isCheckerMode,
 }) => {
+  const pathname = usePathname();
+  const schoolId = pathname.split("/").pop() || "";
+  const auth = useAuth();
+  const { data: userData, error, isLoading } = useFetchUser();
+
+  // Handle authentication error
+  React.useEffect(() => {
+    if (error?.status === 401) {
+      auth.loginRequiredRedirect();
+    }
+  }, [auth, error]);
+
   const cardBgColor =
     account.role === "Student"
       ? "bg-customYellow"
       : account.role === "Teacher"
-      ? "bg-blue-500"
-      : "";
+        ? "bg-blue-500"
+        : "";
 
   const getMappedCourse = (course: string | null): string => {
     if (course === null) return "N/A";
@@ -40,6 +54,10 @@ const StudentCard: React.FC<StudentCardProps> = ({
   };
 
   const mappedCourse = getMappedCourse(account.course);
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="flex">
@@ -64,8 +82,8 @@ const StudentCard: React.FC<StudentCardProps> = ({
             {account.role === "Student"
               ? "STUDENT "
               : account.role === "Teacher"
-              ? "FACULTY "
-              : ""}
+                ? "FACULTY "
+                : ""}
             BORROWERS CARD
           </div>
           <div className="-space-y-2 pr-10">
@@ -83,7 +101,7 @@ const StudentCard: React.FC<StudentCardProps> = ({
 
         <div className="card-section pb-10">
           <span className="pl-10 card-text">Year:</span>
-          <span className="ml-3.5 w-36 card-field">
+          <span className="ml-3.5 w-56 card-field">
             {mappedCourse} - {account.year_level}
           </span>
           <span className="pl-5 card-text">Section:</span>
@@ -95,23 +113,11 @@ const StudentCard: React.FC<StudentCardProps> = ({
           <Grid mode={isCheckerMode} />
         </div>
 
-        <div className="flex justify-between w-full">
-          <div className="pl-10 pt-5 flex text-lg font-semibold gap-2">
-            Account Password Changed:
-            {account.is_activated ? (
-              <span>
-                <CheckIcon />
-              </span>
-            ) : (
-              <span className="text-rose-500">
-                <XIcon />
-              </span>
-            )}
-          </div>
-          <div className="pr-8 pt-5 flex text-lg font-semibold gap-2">
-            Book Card Photo Approval Status:{" "}
-            <ApprovalStatus status={account.isBookCardPhotoApproved} />
-          </div>
+        <div className="pt-2 px-10">
+          <ClearanceCheckboxes
+            schoolId={schoolId}
+            clearedBy={userData?.username || ""}
+          />
         </div>
       </div>
       <div className="w-[320px]">

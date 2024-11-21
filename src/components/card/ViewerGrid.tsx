@@ -1,8 +1,15 @@
+// ViewerGrid.tsx
 import React from "react";
 import { GridProps, Column } from "./GridCommon";
+import { Id } from "../../../convex/_generated/dataModel";
+import ClearanceCheckbox from "../clearance/ClearanceCheckbox";
+import ClearanceCheckboxes from "../clearance/ClearanceCheckboxes";
 
 const ViewerGrid: React.FC<GridProps> = ({ studentId }) => {
   const numberOfColumns = 6;
+
+  // Convert string ID to Convex ID type
+  const accountId = studentId as Id<"accounts">;
 
   const handleDataChange = (index: number, value: string) => {
     // In viewer mode, we don't change the data
@@ -24,6 +31,7 @@ const ViewerGrid: React.FC<GridProps> = ({ studentId }) => {
           />
         ))}
       </div>
+      <ClearanceCheckboxes schoolId="52311077" clearedBy="admin123" />
     </div>
   );
 };

@@ -1,24 +1,32 @@
 import { Icons } from "@/components/icons";
 import { Id } from "../../convex/_generated/dataModel";
 
-// New Clearance Type
+export type SemesterLabel =
+  | "1st Yr - 1st Sem"
+  | "1st Yr - 2nd Sem"
+  | "2nd Yr - 1st Sem"
+  | "2nd Yr - 2nd Sem"
+  | "3rd Yr - 1st Sem"
+  | "3rd Yr - 2nd Sem"
+  | "4th Yr - 1st Sem"
+  | "4th Yr - 2nd Sem"
+  | "5th Yr - 1st Sem"
+  | "5th Yr - 2nd Sem";
+
 export interface ClearanceType {
   _id: Id<"clearance">;
   account_id: Id<"accounts">;
-  semester_label:
-    | "1st Yr - 1st Sem"
-    | "1st Yr - 2nd Sem"
-    | "2nd Yr - 1st Sem"
-    | "2nd Yr - 2nd Sem"
-    | "3rd Yr - 1st Sem"
-    | "3rd Yr - 2nd Sem"
-    | "4th Yr - 1st Sem"
-    | "4th Yr - 2nd Sem"
-    | "5th Yr - 1st Sem"
-    | "5th Yr - 2nd Sem";
+  semester_label: SemesterLabel;
   isCleared: boolean;
   cleared_at?: number;
   cleared_by?: string;
+}
+
+export interface ClearanceCheckboxProps {
+  accountId: Id<"accounts">;
+  semesterLabel: SemesterLabel;
+  clearedBy: string;
+  initialIsCleared?: boolean;
 }
 
 export interface ButtonType {
