@@ -1,14 +1,7 @@
-import { DashReloader } from "@/components/dashboard/DashReloader";
 import { Button } from "@/components/ui/button";
-import getCurrentUser from "@/utils/getCurrentUser";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 
-const DashboardPage: React.FC = async () => {
-  const user = await getCurrentUser();
-
-  if (!user) redirect("/login");
-
+const DashboardPage: React.FC = () => {
   return (
     // <DashReloader />
     <div className="flex flex-col justify-center items-center h-full w-full space-y-4">

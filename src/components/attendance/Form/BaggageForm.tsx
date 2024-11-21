@@ -49,7 +49,7 @@ export default function Component(
   };
 
   return (
-    <Card className="w-full max-w-4xl mx-auto overflow-hidden bg-gradient-to-br from-green-100 to-yellow-100">
+    <Card className="absolute -top-24 left-36 max-w-4xl mx-auto overflow-hidden bg-gradient-to-br from-green-100 to-yellow-100">
       <CardContent className="p-8">
         <h2 className="text-6xl font-semibold text-center mb-12 text-green-800 h-24">
           {typedText}

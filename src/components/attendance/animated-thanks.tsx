@@ -43,13 +43,13 @@ export default function AnimatedThanks({
     >
       {/* Add countdown indicator */}
       <motion.div
-        className="absolute top-0 left-0 w-full h-1 bg-green-200"
+        className="absolute -top-36 md:-right-16 right-8 w-full h-1 bg-green-200"
         initial={{ scaleX: 1 }}
         animate={{ scaleX: 0 }}
         transition={{ duration: 5, ease: "linear" }}
       />
 
-      <Card className="w-full max-w-2xl text-center mx-auto overflow-hidden bg-gradient-to-br from-green-100 to-yellow-100 shadow-lg">
+      <Card className="absolute left-72 -top-32 w-full max-w-2xl text-center mx-auto overflow-hidden bg-gradient-to-br from-green-100 to-yellow-100 shadow-lg">
         <CardContent className="p-8">
           <motion.div
             initial={{ scale: 0 }}

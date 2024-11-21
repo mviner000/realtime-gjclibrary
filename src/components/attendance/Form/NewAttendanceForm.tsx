@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import Lottie from "react-lottie";
+import XmasSock from "./XmasSock.json";
 import { useToast } from "@/components/ui/use-toast";
 import { motion } from "framer-motion";
 import { X } from "lucide-react";
@@ -194,12 +195,33 @@ export default function NewAttendanceForm() {
     );
   };
 
+  const defaultOptionsConfetti = {
+    loop: true,
+    autoplay: true,
+    animationData: XmasSock,
+    rendererSettings: {
+      preserveAspectRatio: "xMidYMid slice",
+    },
+  };
+
   return (
     <Card className="w-full z-[1] bg-transparent outline-none border-none">
-      <CardContent className="p-6 flex">
+      <CardContent className="p-6 pl-16 flex">
         {/* Left side */}
-        <div className="w-1/4 pr-6">
-          <AnimatedWelcome />
+        <div className="static w-1/4 pr-0 mt-16">
+          <div className="relative md:-ml-14 lg:-ml-0">
+            <div className="absolute z-[2] left-24 -bottom-28 rotate-3">
+              <Lottie
+                options={defaultOptionsConfetti}
+                height={220}
+                width={220}
+              />
+            </div>
+            <div className="absolute z-[3] bottom-0">
+              <AnimatedWelcome />
+            </div>
+          </div>
+
           <IdInput
             studentId={studentId}
             onChange={setStudentId}
@@ -210,7 +232,7 @@ export default function NewAttendanceForm() {
         </div>
 
         {/* Right side */}
-        <div className="w-3/4 pl-6 pr-24 relative">
+        <div className="w-3/4 pl-6 relative">
           {/* Cancel Button - Only show for steps 2 and 3 */}
           {(currentStep === 2 || currentStep === 3) && (
             <motion.div
@@ -219,7 +241,7 @@ export default function NewAttendanceForm() {
               transition={{ duration: 0.5 }}
             >
               <button
-                className="px-2.5 py-1 rounded-lg absolute right-28 -top-14 flex items-center border border-red-500 bg-gradient-to-r from-rose-300 to-red-500 text-white transition-all duration-200 shadow-lg "
+                className="px-2.5 py-1 rounded-lg absolute right-28 -top-36 flex items-center border border-red-500 bg-gradient-to-r from-rose-300 to-red-500 text-white transition-all duration-200 shadow-lg "
                 onClick={resetForm}
               >
                 <X className="w-5 h-5 mr-2 transition-transform duration-300 ease-out group-hover:rotate-90" />

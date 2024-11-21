@@ -15,6 +15,7 @@ import type {
 } from "convex/server";
 import type * as helper from "../helper.js";
 import type * as queries_accounts from "../queries/accounts.js";
+import type * as queries_clearance from "../queries/clearance.js";
 import type * as queries_components_styles from "../queries/components_styles.js";
 import type * as queries_pages from "../queries/pages.js";
 
@@ -29,6 +30,7 @@ import type * as queries_pages from "../queries/pages.js";
 declare const fullApi: ApiFromModules<{
   helper: typeof helper;
   "queries/accounts": typeof queries_accounts;
+  "queries/clearance": typeof queries_clearance;
   "queries/components_styles": typeof queries_components_styles;
   "queries/pages": typeof queries_pages;
 }>;

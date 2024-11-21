@@ -1,12 +1,6 @@
 import { PageDesignManager } from "@/components/moderator/PageDesign/PageDesignManager";
-import getCurrentUser from "@/utils/getCurrentUser";
-import { redirect } from "next/navigation";
 
-const DesignerSettingsPage: React.FC = async () => {
-  const user = await getCurrentUser();
-
-  if (!user) redirect("/login");
-
+const DesignerSettingsPage: React.FC = () => {
   return (
     <div className="p-6">
       <h1 className="sm:text-5xl font-bold mb-4">

@@ -1,10 +1,30 @@
 import { Icons } from "@/components/icons";
 import { Id } from "../../convex/_generated/dataModel";
 
+// New Clearance Type
+export interface ClearanceType {
+  _id: Id<"clearance">;
+  account_id: Id<"accounts">;
+  semester_label:
+    | "1st Yr - 1st Sem"
+    | "1st Yr - 2nd Sem"
+    | "2nd Yr - 1st Sem"
+    | "2nd Yr - 2nd Sem"
+    | "3rd Yr - 1st Sem"
+    | "3rd Yr - 2nd Sem"
+    | "4th Yr - 1st Sem"
+    | "4th Yr - 2nd Sem"
+    | "5th Yr - 1st Sem"
+    | "5th Yr - 2nd Sem";
+  isCleared: boolean;
+  cleared_at?: number;
+  cleared_by?: string;
+}
+
 export interface ButtonType {
   _id: string;
   tailwindClasses: string;
-};
+}
 
 export type BadgeType = {
   _id: string;
@@ -12,41 +32,41 @@ export type BadgeType = {
 };
 
 export interface PageType {
-  _id: Id<"pages">
-  pageNumber: number
-  pageUrl: string
-  proposedBy: string
-  proposedDate: string
-  updatedCounts: number
-  lastUpdateDate: string
-  approvedBy: string
-  notes: string
-  isChecked: boolean
-  imageId?: Id<"_storage">
-};
+  _id: Id<"pages">;
+  pageNumber: number;
+  pageUrl: string;
+  proposedBy: string;
+  proposedDate: string;
+  updatedCounts: number;
+  lastUpdateDate: string;
+  approvedBy: string;
+  notes: string;
+  isChecked: boolean;
+  imageId?: Id<"_storage">;
+}
 
 export interface AccountType {
-  _id: Id<"accounts">
-  school_id: string | number
-  first_name?: string
-  middle_name?: string
-  last_name?: string
-  gender?: "MALE" | "FEMALE" | "TOUPDATE"
-  course?: string
-  department?: string
-  position?: string
-  major?: string
-  year_level?: string
-  role?: "Student" | "Faculty"
-  updated_at?: number
+  _id: Id<"accounts">;
+  school_id: string | number;
+  first_name?: string;
+  middle_name?: string;
+  last_name?: string;
+  gender?: "MALE" | "FEMALE" | "TOUPDATE";
+  course?: string;
+  department?: string;
+  position?: string;
+  major?: string;
+  year_level?: string;
+  role?: "Student" | "Faculty";
+  updated_at?: number;
 }
 
 export interface SearchResultsType {
-  accounts: AccountType[]
-  totalPages: number
-  currentPage: number
-  hasNextPage: boolean
-  hasPrevPage: boolean
+  accounts: AccountType[];
+  totalPages: number;
+  currentPage: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
 }
 
 export type UserId = number;
