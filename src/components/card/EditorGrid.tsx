@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { usePathname } from "next/navigation";
 import { useToast } from "@/components/ui/use-toast";
 import Column from "./EditorMode/Column";
@@ -51,6 +51,7 @@ const EditorGrid: React.FC<EditorGridProps> = ({ studentId, mode }) => {
     null
   );
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [lastInput, setLastInput] = useState("");
 
   const [updateData, setUpdateData] = useState<{
     transactionId?: number;
@@ -120,6 +121,7 @@ const EditorGrid: React.FC<EditorGridProps> = ({ studentId, mode }) => {
   const handleDataChange = (index: number, value: string) => {
     updateGridData(index, value);
     setActiveCell(index);
+    setLastInput(value);
     debouncedFetchSuggestions(value);
   };
 
@@ -206,6 +208,12 @@ const EditorGrid: React.FC<EditorGridProps> = ({ studentId, mode }) => {
     setIsUpdateModalOpen(true);
   };
 
+  const handleSuggestionCancel = useCallback((cellIndex: number) => {
+    updateGridData(cellIndex, "");  // Reset the cell content
+    setActiveCell(null);
+    closePopover();
+  }, [updateGridData, setActiveCell, closePopover]);
+
   const handleUpdateBookRecord = (data: any) => {
     setUpdateData({
       ...data,
@@ -283,13 +291,15 @@ const EditorGrid: React.FC<EditorGridProps> = ({ studentId, mode }) => {
         ))}
       </div>
       <SuggestionPopover
-        isOpen={isPopoverOpen}
-        setIsOpen={setIsPopoverOpen}
-        activeCell={activeCell}
-        suggestions={bookSuggestions}
-        onSuggestionClick={handleSuggestionClick}
-        onClose={closePopover}
-      />
+  isOpen={isPopoverOpen}
+  setIsOpen={setIsPopoverOpen}
+  activeCell={activeCell}
+  suggestions={bookSuggestions}
+  onSuggestionClick={handleSuggestionClick}
+  onClose={closePopover}
+  onCancel={handleSuggestionCancel}  // Add this new prop
+  lastInput={lastInput}
+/>
       <ActionSelectionModal
         isOpen={isActionSelectionModalOpen}
         onClose={() => setIsActionSelectionModalOpen(false)}

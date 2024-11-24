@@ -18,6 +18,13 @@ const useGridData = () => {
     }));
   };
 
+  const resetCellContent = (index: number) => {
+    setGridData((prevData) => ({
+      ...prevData,
+      [index]: { value: "", isLineThrough: false }
+    }));
+  };
+
   const resetCell = (index: number) => {
     setGridData((prevData) => {
       const newData = { ...prevData };
@@ -138,6 +145,7 @@ const useGridData = () => {
     gridData,
     updateGridData,
     resetCell,
+    resetCellContent,
     handleLineThroughToggle,
     getCellClassName,
   };
