@@ -75,28 +75,38 @@ export function BookTransactionCard({
     }
   };
 
+  const getLatestRecordType = (records: BookRecord[]) => {
+    const updatedRecords = records.map(r => 
+      (r.record_type === "ADDITION" || r.record_type === "CLEARANCE") 
+        ? { ...r, record_type: "PROCESSING..." } 
+        : r
+    );
+  
+    const sortedRecords = updatedRecords.sort(
+      (a, b) => new Date(b.datetime).getTime() - new Date(a.datetime).getTime()
+    );
+  
+    return sortedRecords[0]?.record_type || null;
+  };
+  
+
+
+  const latestRecordType = getLatestRecordType(transaction.records);
+
   return (
     <>
       <Card className="group relative hover:outline hover:outline-1 hover:cursor-pointer hover:outline-green-500 transition-all transform hover:scale-105 mb-7 ml-5">
         <CardHeader>
           <div className="flex flex-row items-center justify-between space-x-4">
-            <span
-              className={`badge text-center dark:text-white text-black flex-1 font-bold ${
-                latestRecord?.record_type === "BORROWED"
-                  ? "bg-purple-500"
-                  : latestRecord?.record_type === "RETURNED"
-                    ? "bg-green-500"
-                    : latestRecord?.record_type === "EXTENDED"
-                      ? "bg-blue-500"
-                      : latestRecord?.record_type === "CLEARANCE"
-                        ? "bg-orange-500"
-                        : "bg-transparent outline outline-1 text-black"
-              } px-3 py-2 rounded`}
-            >
-              {latestRecord?.record_type === "ADDITION"
-                ? "CLEARED"
-                : latestRecord?.record_type || "N/A"}
-            </span>
+          {latestRecordType && (
+            <div className="text-sm flex justify-between">
+              <div className="space-y-1">
+                <div className="text-sm flex justify-between">
+                  <span className="font-black text-2xl">{latestRecordType}</span>
+                </div>
+              </div>
+            </div>
+          )}
 
             <AlertDialog
               open={isDeleteDialogOpen}
@@ -137,7 +147,7 @@ export function BookTransactionCard({
             </AlertDialog>
           </div>
           <p className="text-lg mt-2 pt-2">
-            {transaction.callno === "00000" ? "✔️" : "📚"}{" "}
+            {transaction.callno === "00000" ? "📰" : "📚"}{"  "}
             {transaction.book_title || "Unknown Title"}
           </p>
         </CardHeader>
@@ -161,32 +171,40 @@ export function BookTransactionCard({
           </CardContent>
         )}
         <CardFooter>
-          <div className="w-full">
-            <p className="text-sm text-gray-500 mb-2">Transaction History:</p>
-            <div className="space-y-1">
-              {transaction.records
-                .filter(
-                  (record) =>
-                    record.record_type !== "ADDITION" &&
-                    record.record_type !== "CLEARANCE"
-                )
-                .sort(
-                  (a, b) =>
-                    new Date(b.datetime).getTime() -
-                    new Date(a.datetime).getTime()
-                )
-                .map((record, index) => (
-                  <div key={index} className="text-sm flex justify-between">
-                    <span>{record.record_type}</span>
-                    {record.record_type !== "ADDITION" &&
-                      record.record_type !== "CLEARANCE" &&
-                      record.record_type !== null && (
-                        <span>{formatDate(record.datetime)}</span>
-                      )}
-                  </div>
-                ))}
+        <div className="w-full">
+  {transaction.records.filter(
+    (record) =>
+      record.record_type !== "ADDITION" &&
+      record.record_type !== "CLEARANCE"
+  ).length > 0 && (
+    <>
+      <p className="text-sm text-gray-500 mb-2">Transaction History:</p>
+      <div className="space-y-1">
+        {transaction.records
+          .filter(
+            (record) =>
+              record.record_type !== "ADDITION" &&
+              record.record_type !== "CLEARANCE"
+          )
+          .sort(
+            (a, b) =>
+              new Date(b.datetime).getTime() - new Date(a.datetime).getTime()
+          )
+          .map((record, index) => (
+            <div key={index} className="text-sm flex justify-between">
+              <span>{record.record_type}</span>
+              {record.record_type !== "ADDITION" &&
+                record.record_type !== "CLEARANCE" &&
+                record.record_type !== null && (
+                  <span>{formatDate(record.datetime)}</span>
+                )}
             </div>
-          </div>
+          ))}
+      </div>
+    </>
+  )}
+</div>
+
         </CardFooter>
       </Card>
     </>
