@@ -76,11 +76,14 @@ export function BookTransactionCard({
   };
 
   const getLatestRecordType = (records: BookRecord[]) => {
-    const updatedRecords = records.map(r => 
-      (r.record_type === "ADDITION" || r.record_type === "CLEARANCE") 
-        ? { ...r, record_type: "PROCESSING..." } 
-        : r
-    );
+    const updatedRecords = records.map(r => {
+      if (r.record_type === "ADDITION" || r.record_type === "CLEARANCE") {
+        return { ...r, record_type: "PROCESSING..." };
+      } else if (r.record_type === "EXTENDED") {
+        return { ...r, record_type: "RENEWAL" };
+      } 
+      return r;
+    });
   
     const sortedRecords = updatedRecords.sort(
       (a, b) => new Date(b.datetime).getTime() - new Date(a.datetime).getTime()
@@ -88,6 +91,7 @@ export function BookTransactionCard({
   
     return sortedRecords[0]?.record_type || null;
   };
+  
   
 
 
